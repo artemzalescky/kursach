@@ -1,0 +1,49 @@
+*{
+	margin:0;
+	padding:0;
+	font: 15px Arial, Helvetica;
+}
+body{
+	background-color:#555;
+	
+    -webkit-touch-callout: none;	/* чтоб текст не выделялся при добавлении объектов */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+canvas{
+	border:solid 1px #090;
+	margin:10px;
+	float:left;
+	background-color:#fff;
+}
+#select_list{
+	height:590px;
+	width:250px;
+	background-color:#eee;
+	border:solid 1px #FF9900;
+	float:left;
+	margin:10px;
+	padding:5px;
+}
+.select_list_panel{
+	margin:10px;
+	background-color:#fff;
+	padding:5px;
+	border-radius:3px;
+	border:solid 1px #dd5500;
+}
+.line{
+	margin:3px 0;
+}
+#add_object_select{
+	margin-left:5px;
+	width:90px;
+}
+.input{
+	margin:2px;
+	margin-left:30px;
+	margin-right:10px;
+	width:50px;
+	height:25px;
+}

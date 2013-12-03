@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Box2dWeb</title>
+		<link href="css/style.css" rel="stylesheet" type="text/css">
+
+		<!-- форма для отрисовки -->
+		<canvas id="canvas" width="950" height="600"></canvas>
+		
+		<!-- библиотеки -->
+		<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
+		<script type="text/javascript" src="lib/jquery-2.0.3.js"></script>
+		
+		<!-- сам javascript-код -->
+		<script type="text/javascript" src="js/objects.js"></script>
+		<script type="text/javascript" src="js/events.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+	</head>
+	
+	<body onload="init();">
+
+		<!-- форма для выбора объектов -->
+		<div id="select_list">
+			<div class="select_list_panel">
+				<span>Гравитация</span>
+				<input id="world_gravity" class="input" type="number" value="10" min="1" max="50" step="1" onChange="updateGravitation();"> м/с<sup>2</sup>
+			</div>
+			
+			<div class="select_list_panel">
+				<span>Выбрать объект</span>
+				<select id="add_object_select">  
+					<option value="object_cursor" selected>Курсор</option>
+					<option value="object_ball">Снаряд</option>
+					<option value="object_box">Ящик</option>
+					<option value="object_human">Человек</option>
+					
+				</select>
+			</div>
+			
+			<div class="select_list_panel">
+				<span style="margin-left:20px;">Свойства нового объекта</span>
+				<hr class="line">
+				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
+				<input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1"> г/см<sup>3</sup>
+				<hr class="line">
+				<span title='в диапазоне от 0 до 1'>Упругость</span>
+				<input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1"> (коэф.)
+			</div>
+			
+			<div class="select_list_panel">
+				<span style="margin-left:20px;">Свойства жидкости</span>
+				<hr class="line">
+				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
+				<input id="water_density" class="input" type="number" value="1" min="0.1" max="15" step="0.1" onChange="updateWaterProperties();"> г/см<sup>3</sup>
+				<hr class="line">
+				<span title='в диапазоне от 0 до 10'>Вязкость</span>
+				<input id="water_drag" class="input" style="margin-left:40px;margin-right:7px;" type="number" value="1" min="0" max="10" step="0.2" 
+				onChange="updateWaterProperties();"> (коэф.)
+			</div>
+		</div>	
+		
+		
+	</body>   
+</html>
