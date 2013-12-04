@@ -11,7 +11,6 @@ function canvasClicked(event) {		// обработчик клика
     var objectType = getObjectType();	// что мы выбрали в форме
 
     if (objectType == 'object_ball') {
-        checkValues();
         addBall_expanded(x, y, 20, document.getElementById('object_density').value, document.getElementById('object_restitution').value);
     }
     if (objectType == 'object_box') {
@@ -20,7 +19,6 @@ function canvasClicked(event) {		// обработчик клика
     if (objectType == 'object_human') {
         addHuman_expanded(x, y, 1, document.getElementById('object_density').value, document.getElementById('object_restitution').value);
     }
-
 }
 
 function mouseDown(event) {		// обработчик нажатия мыши
@@ -93,4 +91,17 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
 
     world.QueryAABB(GetBodyCallback, aabb);
     return body;
+}
+
+function inputDataChanged(event){
+    checkInputValueRange(event.target);
+}
+
+function checkInputValueRange(input_object){
+    // проверка на выход за предельные значения
+    if(parseFloat(input_object.value) < parseFloat(input_object.min)){
+        input_object.value = input_object.min;
+    } else if(parseFloat(input_object.value) > parseFloat(input_object.max)){
+        input_object.value = input_object.max;
+    }
 }

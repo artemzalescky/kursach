@@ -50,6 +50,8 @@ function init() {		// вызывается  при загрузке страни
     canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
     canvas.mouseup(mouseUp);
     canvas.mousemove(mouseMove);
+
+    $('#select_list').change(inputDataChanged);
 }
 
 function setupPhysics() {		// настраивает физику опыта
@@ -89,25 +91,11 @@ function setupBuoyancyController() {	// настраиваем контролл�
 }
 
 function updateWaterProperties() {	// обновить свойства воды
-    checkValues();		// проверить корректность введенных значений
-
     buoyancyController.density = document.getElementById('water_density').value;		// обновляем плотность
     buoyancyController.linearDrag = 2 * document.getElementById('water_drag').value;		// линейное торможение
     buoyancyController.angularDrag = document.getElementById('water_drag').value;		// угловое торможение
 
     wakeAllBodies();		// будим все тела, чтоб сразу обновилась картинка
-}
-
-function checkValues() {		// проверить корректность введенных значений (должны лежать внутри интервалла)
-    // проверка на выход за предельные значения
-    if (parseInt(document.getElementById('water_density').value) < parseInt(document.getElementById('water_density').min))
-        document.getElementById('water_density').value = document.getElementById('water_density').min;
-    if (parseInt(document.getElementById('water_density').value) > parseInt(document.getElementById('water_density').max))
-        document.getElementById('water_density').value = document.getElementById('water_density').max;
-    if (parseInt(document.getElementById('water_drag').value) < parseInt(document.getElementById('water_drag').min))
-        document.getElementById('water_drag').value = document.getElementById('water_drag').min;
-    if (parseInt(document.getElementById('water_drag').value) > parseInt(document.getElementById('water_drag').max))
-        document.getElementById('water_drag').value = document.getElementById('water_drag').max;
 }
 
 function wakeAllBodies() {	// разбудить все тела (для изменения параметров воды)
