@@ -1,27 +1,3 @@
-var b2Vec2 = Box2D.Common.Math.b2Vec2			// просто сокращения названий
-    , b2AABB = Box2D.Collision.b2AABB
-    , b2BodyDef = Box2D.Dynamics.b2BodyDef
-    , b2Body = Box2D.Dynamics.b2Body
-    , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
-    , b2Fixture = Box2D.Dynamics.b2Fixture
-    , b2World = Box2D.Dynamics.b2World
-    , b2MassData = Box2D.Collision.Shapes.b2MassData
-    , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-    , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-    , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
-    , b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef
-    , b2WeldJointDef = Box2D.Dynamics.Joints.b2WeldJointDef
-    , b2Shape = Box2D.Collision.Shapes.b2Shape
-    , b2Joint = Box2D.Dynamics.Joints.b2Joint
-    , b2Settings = Box2D.Common.b2Settings
-    , b2ContactFilter = Box2D.Dynamics.b2ContactFilter
-    , b2BuoyancyController = Box2D.Dynamics.Controllers.b2BuoyancyController
-    , b2Color = Box2D.Common.b2Color;
-
-
-var FPS = 60; 	// отрисовка (кадров в секунду)
-var SCALE = 30;  // пикселей в метре
-
 var buoyancyController;	// контроллер плавучести
 var debugDraw;			// отрисовщик
 
@@ -32,6 +8,11 @@ var CANVAS_HEIGHT;
 
 var world;	// объект мира
 var ground;	// тело земли
+
+
+function toMeters(pixels) {		// перевод из пикселей в метры
+    return pixels / SCALE;
+}
 
 
 function init() {		// вызывается  при загрузке страницы (основная функция)
@@ -46,11 +27,11 @@ function init() {		// вызывается  при загрузке страни
     setupBuoyancyController();					// настраиваем контроллер плавучести
 
     // добавляем обработчики событий
-    canvas.click(canvasClicked)
     canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
     canvas.mouseup(mouseUp);
     canvas.mousemove(mouseMove);
 
+    $('body').keypress(keyPressed); // отлавливание событий нажатия клавиш
     $('#select_list').change(inputDataChanged);
 }
 
@@ -60,16 +41,20 @@ function setupPhysics() {		// настраивает физику опыта
     world = new b2World(gravity, allowSleeping);	// создаем мир
 
     setWorldBounds();	// устанавливаем границы мира
-
-    createPool(475, 500, 700, 200);
-    addBox(400, 300, 60, 60);
 }
 
 function setWorldBounds() {		// установить границы мира
-    ground = addBox(CANVAS_WIDTH / 2, CANVAS_HEIGHT, CANVAS_WIDTH, 2, true);	// создаем землю
-    addBox(CANVAS_WIDTH / 2, 0, CANVAS_WIDTH, 2, true);						// потолок
-    addBox(0, CANVAS_HEIGHT / 2, 2, CANVAS_HEIGHT, true);						// стены
-    addBox(CANVAS_WIDTH, CANVAS_HEIGHT / 2, 2, CANVAS_HEIGHT, true);
+    ground = createWorldBound(0, CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);	// создаем землю
+    createWorldBound(0, 0, CANVAS_WIDTH, 0);						// потолок
+    createWorldBound(0, 0, 0, CANVAS_HEIGHT);						// стены
+    createWorldBound(CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+}
+
+function createWorldBound(x1, y1, x2, y2) {
+    p1 = new b2Vec2(toMeters(x1), toMeters(y1));
+    p2 = new b2Vec2(toMeters(x2), toMeters(y2));
+    // получаем строитель прямоугольников и создаем границу по двум точкам
+    return BUILDERS['object_box'].build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
 }
 
 function updateGravitation() {	// обновить гравитацию

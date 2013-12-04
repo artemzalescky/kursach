@@ -2,34 +2,17 @@
 
 var mousePressed = false;	// нажата ли кнопка мыши
 var mouseJoint = false;		// хранит соединение с мышью
+var selectedObjectBuilder = undefined;      // текущий строитель объектов
 
-function canvasClicked(event) {		// обработчик клика
-
-    var x = event.offsetX,	// координаты курсора
-        y = event.offsetY;
-
-    var objectType = getObjectType();	// что мы выбрали в форме
-
-    if (objectType == 'object_ball') {
-        addBall_expanded(x, y, 20, document.getElementById('object_density').value, document.getElementById('object_restitution').value);
-    }
-    if (objectType == 'object_box') {
-        addBox_expanded(x, y, 40, 40, document.getElementById('object_density').value, document.getElementById('object_restitution').value);
-    }
-    if (objectType == 'object_human') {
-        addHuman_expanded(x, y, 1, document.getElementById('object_density').value, document.getElementById('object_restitution').value);
-    }
-}
 
 function mouseDown(event) {		// обработчик нажатия мыши
-    mousePressed = true;		// флажок, что кликнули
+    event.preventDefault();     // отменить обычное действие события
+    mousePressed = true;		// флажок, что нажали
 
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
 
     if (mouseJoint == false && getObjectType() == "object_cursor") {	// если нет соединения с курсором и мы не выбрали добавление объекта
-        event.preventDefault();
         var body = getBodyAtPoint(cursorPoint);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
-
         if (body) {	// если там было тело
             var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
             def.bodyA = ground;
@@ -43,6 +26,8 @@ function mouseDown(event) {		// обработчик нажатия мыши
 
             body.SetAwake(true);	// будим тело
         }
+    } else if(selectedObjectBuilder) {
+        selectedObjectBuilder.creationController.mouseDown(cursorPoint);
     }
 };
 
@@ -52,14 +37,26 @@ function mouseUp() {	// обработчик "отжатия" мыши
     if (mouseJoint) {	// если курсор был соединен с телом
         world.DestroyJoint(mouseJoint);	// уничтожаем соединение
         mouseJoint = false;
+    } else if(selectedObjectBuilder) {
+        var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
+        selectedObjectBuilder.creationController.mouseUp(cursorPoint);
     }
 }
 
 function mouseMove(event) {		// обработчик движения курсора
-    var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// коорд. курсора
-
     if (mouseJoint) {		// если есть соединение с курсором
+        var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// коорд. курсора
         mouseJoint.SetTarget(cursorPoint);	 // уст. новую точку курсора
+    }
+}
+
+// обработчик нажатия клавиш
+function keyPressed(event) {
+    if(event.which === KEY_CODE.ENTER) {
+        // не все контроллеры обрабатывают нажатие клавиши enter
+        if(selectedObjectBuilder.creationController.enterPressed) {
+            selectedObjectBuilder.creationController.enterPressed();
+        }
     }
 }
 
@@ -93,8 +90,23 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
     return body;
 }
 
+// обработчик изменения полей данных
 function inputDataChanged(event){
-    checkInputValueRange(event.target);
+    // проверяем попадание в диапазон значений только для числовых инпутов
+    if(event.target.type === 'number') {
+        checkInputValueRange(event.target);
+    }
+
+    // устанавливаем строитель объектов
+    if(event.target.id === 'add_object_select') {
+        objectType = getObjectType();
+        switch(objectType) {
+            case 'object_ball':
+            case 'object_box':
+            case 'object_poly':
+                selectedObjectBuilder = BUILDERS[objectType];
+        }
+    }
 }
 
 function checkInputValueRange(input_object){

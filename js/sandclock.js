@@ -85,6 +85,6 @@ function setClock() {
 function createSand() {
     var r = 3;
     for (i = 0; i < 100; i++) {
-        addBall(x_clock - box_width / 2 + 10 + (2 * r * (i % 30)), y_clock - H / 2 - box_height + 15 + 2 * r * i / 30, r);
+        createBall(x_clock - box_width / 2 + 10 + (2 * r * (i % 30)), y_clock - H / 2 - box_height + 15 + 2 * r * i / 30, r);
     }
 }
