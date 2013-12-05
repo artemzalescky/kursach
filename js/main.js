@@ -44,7 +44,8 @@ var ground;	// тело земли
 		setupPhysics();								// настраивает физику опыта
 		setupDebugDraw();							// настраиваем debug draw (стандартный отрисовщик)
 		window.setInterval(update, 1000 / FPS);		// интервал обновления
-		setupBuoyancyController();					// настраиваем контроллер плавучести
+		experiment2();
+		//setupBuoyancyController();					// настраиваем контроллер плавучести
 		
 		// добавляем обработчики событий
 		canvas.on('click', canvasClicked);
@@ -61,8 +62,8 @@ var ground;	// тело земли
          
 		setBounds();	// устанавливаем границы мира
 		
-		createPool(475,500,700,200);
-		addBox(400,300,60,60);
+		//createPool(475,500,700,200);
+		addBox(600,100,60,60);
 	}
 	  
 	function setBounds(){		// установить границы мира
@@ -77,8 +78,11 @@ var ground;	// тело земли
 		var body2 = addBall(440,350,30);
 		var body3 = addBall(500,350,30);
 		var body4 = addBall(560,350,30);
+		var body5 = addBox(250,100,150,50,true);
+		var body6 = addBox(750,100,150,50,true);
+	
 		
-		var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
+		/*var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
 		def.Initialize(body1,
 		body2,
 		new b2Vec2(body1.GetWorldCenter().x-2,body1.GetWorldCenter().y),
@@ -97,11 +101,14 @@ var ground;	// тело земли
 		body4.GetWorldCenter());
 		world.CreateJoint(def);
 		
-		def.Initialize(body1,
+		def.Initialize(body2,
 		body3,
-		new b2Vec2(body1.GetWorldCenter().x,body1.GetWorldCenter().y),
-		body3.GetWorldCenter());
-		world.CreateJoint(def);
+		new b2Vec2(body2.GetWorldCenter().x,body3.GetWorldCenter().y),
+		new b2Vec2(body3.GetWorldCenter().x,body3.GetWorldCenter().y));
+		def.length = 3;
+		def.collideConnected = true;
+		world.CreateJoint(def);*/
+		
 	}
 
 	function updateGravitation(){	// обновить гравитацию

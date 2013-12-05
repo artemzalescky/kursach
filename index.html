@@ -5,7 +5,7 @@
 		<link href="css/style.css" rel="stylesheet" type="text/css">
 
 		<!-- форма для отрисовки -->
-		<canvas id="canvas" width="950" height="600"></canvas>
+		<canvas id="canvas" width="1200" height="600"></canvas>
 		
 		<!-- библиотеки -->
 		<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
@@ -30,6 +30,7 @@
 				<span>Выбрать объект</span>
 				<select id="add_object_select">  
 					<option value="object_cursor" selected>Курсор</option>
+					<option value="object_joint">Соединение</option>
 					<option value="object_ball">Снаряд</option>
 					<option value="object_box">Ящик</option>
 					<option value="object_human">Человек</option>
@@ -58,7 +59,6 @@
 				onChange="updateWaterProperties();"> (коэф.)
 			</div>
 		</div>	
-		
-		
+				
 	</body>   
 </html>

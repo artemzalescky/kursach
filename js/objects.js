@@ -3,7 +3,7 @@ function toMeters(pixels){		// перевод из пикселей в метр�
 }
 
 function addBox_expanded(x,y,width,height,density,restitution,is_static){	// больше параметров
-	var fixDef = new b2FixtureDef;
+	var fixDef = new b2FixtureDef; 
 	
 	if (is_static === undefined) {		// параметр по умолчанию
 		is_static = false;			// тела считаем динамическими
