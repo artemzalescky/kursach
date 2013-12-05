@@ -5,14 +5,13 @@ var mouseJoint = false;		// хранит соединение с мышью
 var arr = [];
 var i = 0; 
 function canvasClicked(event) {		// обработчик клика
-  	
+
     var x = event.offsetX,	// координаты курсора
-        y = event.offsetY;	
-	
+        y = event.offsetY;
+
     var objectType = getObjectType();	// что мы выбрали в форме
 
-	if(objectType == 'object_ball') {      
-		checkValues();
+	if(objectType == 'object_ball') {
 		addBall_expanded(x,y,20,document.getElementById('object_density').value,document.getElementById('object_restitution').value);
 	}
 	if(objectType == 'object_box') {        
@@ -66,20 +65,20 @@ function mouseDown(event) {		// обработчик нажатия мыши
 };
 
 function mouseUp() {	// обработчик "отжатия" мыши
-	mousePressed = false;	// флажок на "отжат"
+    mousePressed = false;	// флажок на "отжат"
 
-	if(mouseJoint) {	// если курсор был соединен с телом
-		world.DestroyJoint(mouseJoint);	// уничтожаем соединение
-		mouseJoint = false;
-	}
+    if (mouseJoint) {	// если курсор был соединен с телом
+        world.DestroyJoint(mouseJoint);	// уничтожаем соединение
+        mouseJoint = false;
+    }
 }
 
 function mouseMove(event) {		// обработчик движения курсора
-	var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// коорд. курсора
+    var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// коорд. курсора
 
-	if(mouseJoint){		// если есть соединение с курсором
-		mouseJoint.SetTarget(cursorPoint);	 // уст. новую точку курсора
-	}
+    if (mouseJoint) {		// если есть соединение с курсором
+        mouseJoint.SetTarget(cursorPoint);	 // уст. новую точку курсора
+    }
 }
 
 function getObjectType() {		// возвращает тип выбранного объекта из формы
@@ -87,33 +86,45 @@ function getObjectType() {		// возвращает тип выбранного 
 }
 
 function getBodyAtPoint(point, includeStatic) {		// тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
-	var aabb = new b2AABB();		// созд. область, где ищем тело
-	aabb.lowerBound.Set(point.x - 0.001, point.y - 0.001);
-	aabb.upperBound.Set(point.x + 0.001, point.y + 0.001);
+    var aabb = new b2AABB();		// созд. область, где ищем тело
+    aabb.lowerBound.Set(point.x - 0.001, point.y - 0.001);
+    aabb.upperBound.Set(point.x + 0.001, point.y + 0.001);
 
-	var body = null;
+    var body = null;
 
-	function GetBodyCallback(fixture){	// для перекрывающихся тел
-		var shape = fixture.GetShape();
+    function GetBodyCallback(fixture) {	// для перекрывающихся тел
+        var shape = fixture.GetShape();
 
 		if (fixture.GetBody().GetType() != includeStatic){
 			var inside = shape.TestPoint(fixture.GetBody().GetTransform(), point);	// попали ли в тело
 
-			if (inside){
-				body = fixture.GetBody();
-				return false;
-			}
-		}
+            if (inside) {
+                body = fixture.GetBody();
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	world.QueryAABB(GetBodyCallback, aabb);
-	return body;
+    world.QueryAABB(GetBodyCallback, aabb);
+    return body;
 }
 
-function create_joint(arr) // создание соединения между двумя объектами
-{
+function inputDataChanged(event){
+    checkInputValueRange(event.target);
+}
+
+function checkInputValueRange(input_object){
+    // проверка на выход за предельные значения
+    if(parseFloat(input_object.value) < parseFloat(input_object.min)){
+        input_object.value = input_object.min;
+    } else if(parseFloat(input_object.value) > parseFloat(input_object.max)){
+        input_object.value = input_object.max;
+    }
+}
+
+function create_joint(arr) { // создание соединения между двумя объектами
 	//var cursorPoint1 = arr.pop();
 	var body1 = arr.pop();
 	//var cursorPoint2 = arr.pop();
