@@ -65,6 +65,22 @@ function updateGravitation() {	// обновить гравитацию
     wakeAllBodies();		// будим все тела, чтоб сразу обновилась картинка
 }
 
+function updateObjectProperties(){	// обновить свойства выделенного объекта
+		if(selectedObject != null){		// есть выделенное тело
+
+			var f = selectedObject.GetFixtureList();
+			f.SetDensity(document.getElementById('object_density').value);
+			f.SetRestitution(document.getElementById('object_restitution').value);
+			f.SetFriction(document.getElementById('object_friction').value);				
+			
+			selectedObject.SetAwake(true);		// будим выделенное тело (чтобы сразу узреть изменения)
+		}
+	}
+	
+function resetSelectedObject(){
+  selectedObject = null;  // чтоб не менялись св-ва только что созданного объекта
+ }
+
 function setupBuoyancyController() {	// настраиваем контроллер плавучести
     buoyancyController = new b2BuoyancyController();
 

@@ -4,6 +4,7 @@ var selectController = SelectController();
 var mousePressed = false;	// нажата ли кнопка мыши
 var mouseJoint = false;		// хранит соединение с мышью
 var selectedObjectBuilder = undefined;      // текущий строитель объектов
+var selectedObject = null;		// выделенный объект (b2Body (или null, если ни в кого не попали))
 
 var arr = [];
 var i = 0; 
@@ -16,7 +17,7 @@ function mouseDown(event) {		// обработчик нажатия мыши
 	
     selectController.setStartPoint(event.offsetX, event.offsetY);
 	
-	if(getObjectType()=="object_joint") //если выбрали соединение
+	if(getActionType()=="object_joint" & getObjectType() == "object_cursor" ) //если выбрали соединение
 	{
 		var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
 	
@@ -31,22 +32,37 @@ function mouseDown(event) {		// обработчик нажатия мыши
 				i = 0;
 			}		
 		}
-	} else if(mouseJoint == false && getObjectType() == "object_cursor"){	// если нет соединения с курсором и мы не выбрали добавление объекта
+	}
+	if(getActionType()=="object_delete" & getObjectType() == "object_cursor"  ) //если выбрали удаление
+	{
+		var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
+	
+		if(body) // если тело там было
+		{				
+			world.DestroyBody(body);			
+		}		
+	} else if(mouseJoint == false && getObjectType() == "object_cursor" & getActionType()=="object_empty"){	// если нет соединения с курсором и мы не выбрали добавление объекта
 		event.preventDefault();
-		var body = getBodyAtPoint(cursorPoint);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
+		selectedObject = getBodyAtPoint(cursorPoint);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
 
-        if(body) {	// если там было тело
+		if(selectedObject){	// если там было тело
+
+		// выводим в "Свойства объекта" св-ва выделенного объекта
+		document.getElementById('object_density').value = selectedObject.GetFixtureList().GetDensity();							
+		document.getElementById('object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
+		document.getElementById('object_friction').value = selectedObject.GetFixtureList().GetFriction();
+
             var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
             def.bodyA = ground;
-            def.bodyB = body;
+            def.bodyB = selectedObject;
             def.target = cursorPoint;
             def.collideConnected = true;
-            def.maxForce = 10000 * body.GetMass();
+            def.maxForce = 10000 * selectedObject.GetMass();
             def.dampingRatio = 0;
 
             mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
 
-            body.SetAwake(true);	// будим тело
+            selectedObject.SetAwake(true);	// будим тело
         }
     } else if(selectedObjectBuilder) {
         selectedObjectBuilder.creationController.mouseDown(cursorPoint);
@@ -94,6 +110,10 @@ function keyPressed(event) {
 
 function getObjectType() {		// возвращает тип выбранного объекта из формы
     return $('#add_object_select').val();
+}
+
+function getActionType() {		// возвращает действие выбранного объекта из формы
+    return $('#add_object_action').val();
 }
 
 function getBodyAtPoint(point, includeStatic) {		// тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
