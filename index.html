@@ -5,16 +5,18 @@
 		<link href="css/style.css" rel="stylesheet" type="text/css">
 
 		<!-- форма для отрисовки -->
-		<canvas id="canvas" width="1200" height="600"></canvas>
+		<canvas id="canvas" width="950" height="600"></canvas>
 		
 		<!-- библиотеки -->
 		<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
 		<script type="text/javascript" src="lib/jquery-2.0.3.js"></script>
 		
 		<!-- сам javascript-код -->
+        <script type="text/javascript" src="js/constants.js"></script>
+        <script type="text/javascript" src="js/controllers.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/objects.js"></script>
 		<script type="text/javascript" src="js/events.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	
 	<body onload="init();">
@@ -58,7 +60,8 @@
 				<input id="water_drag" class="input" style="margin-left:40px;margin-right:7px;" type="number" value="1" min="0" max="10" step="0.2" 
 				onChange="updateWaterProperties();"> (коэф.)
 			</div>
-		</div>	
+            <input id="pause_simulation_button" type="button" value="Start/stop">
+		</div>
 				
 	</body>   
 </html>

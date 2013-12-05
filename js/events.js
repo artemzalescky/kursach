@@ -1,9 +1,13 @@
 // обработчики событий и состояний 
 
+var selectController = SelectController();
+
 var mousePressed = false;	// нажата ли кнопка мыши
 var mouseJoint = false;		// хранит соединение с мышью
+
 var arr = [];
-var i = 0; 
+var i = 0;
+
 function canvasClicked(event) {		// обработчик клика
 
     var x = event.offsetX,	// координаты курсора
@@ -26,6 +30,8 @@ function canvasClicked(event) {		// обработчик клика
 function mouseDown(event) {		// обработчик нажатия мыши
 	mousePressed = true;		// флажок, что кликнули
 	var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
+
+    selectController.setStartPoint(event.offsetX, event.offsetY);
 	
 	if(getObjectType()=="object_joint") //если выбрали соединение
 	{
@@ -66,6 +72,8 @@ function mouseDown(event) {		// обработчик нажатия мыши
 
 function mouseUp() {	// обработчик "отжатия" мыши
     mousePressed = false;	// флажок на "отжат"
+    selectController.updateSelection();
+    painter.setSelectionActive(false);
 
     if (mouseJoint) {	// если курсор был соединен с телом
         world.DestroyJoint(mouseJoint);	// уничтожаем соединение
@@ -75,7 +83,11 @@ function mouseUp() {	// обработчик "отжатия" мыши
 
 function mouseMove(event) {		// обработчик движения курсора
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// коорд. курсора
-
+    if (mousePressed) {
+        selectController.setEndPoint(event.offsetX, event.offsetY);
+        painter.setSelectionActive(true);
+        painter.setSelectionRegion(selectController.getStartPoint(), selectController.getEndPoint());
+    }
     if (mouseJoint) {		// если есть соединение с курсором
         mouseJoint.SetTarget(cursorPoint);	 // уст. новую точку курсора
     }
@@ -140,4 +152,11 @@ function create_joint(arr) { // создание соединения между
 		world.CreateJoint(def);
 		body1.SetAwake(true);  //будим тело 1
 		body2.SetAwake(true);  //будим тело 2
+}
+
+function pauseButtonEvent(event) {
+    worldActivated = !worldActivated;
+    for (var shape = world.GetBodyList(); shape; shape = shape.GetNext()) {
+        shape.SetActive(worldActivated);
+    }
 }

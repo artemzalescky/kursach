@@ -2,6 +2,10 @@ function toMeters(pixels) {		// перевод из пикселей в метр
     return pixels / SCALE;
 }
 
+function fromMeters(meters) {
+    return meters * SCALE;
+}
+
 
 function addBox_expanded(x, y, width, height, density, restitution, is_static) {	// больше параметров
     var fixDef = new b2FixtureDef;
