@@ -43,7 +43,7 @@ function mouseDown(event) {		// обработчик нажатия мыши
 		}		
 	} else if(mouseJoint == false && getObjectType() == "object_cursor" & getActionType()=="object_empty"){	// если нет соединения с курсором и мы не выбрали добавление объекта
 		event.preventDefault();
-		selectedObject = getBodyAtPoint(cursorPoint);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
+		selectedObject = getBodyAtPoint(cursorPoint,true);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
 
 		if(selectedObject){	// если там было тело
 
@@ -51,6 +51,8 @@ function mouseDown(event) {		// обработчик нажатия мыши
 		document.getElementById('object_density').value = selectedObject.GetFixtureList().GetDensity();							
 		document.getElementById('object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
 		document.getElementById('object_friction').value = selectedObject.GetFixtureList().GetFriction();
+		//для угла поворота
+		document.getElementById('object_gradus').value = toDegrees(selectedObject.GetAngle());
 
             var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
             def.bodyA = ground;
@@ -126,7 +128,7 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
     function GetBodyCallback(fixture) {	// для перекрывающихся тел
         var shape = fixture.GetShape();
 
-		if (fixture.GetBody().GetType() != includeStatic){
+		if ((fixture.GetBody().GetType() != b2Body.b2_staticBody || includeStatic) && fixture.IsSensor()==false){ // сенсоры не выделяются (чтоб тело в воде можно было выделить)
 			var inside = shape.TestPoint(fixture.GetBody().GetTransform(), point);	// попали ли в тело
 
             if (inside) {

@@ -1,3 +1,14 @@
+function toRadian(degrees){  // перевод из градусов в радианы (в box2d угол в радианах)
+ return degrees * Math.PI/180;
+}
+
+function toDegrees(degrees){  // перевод из радианы в градусов  
+ return degrees * 180/Math.PI;
+}
+
+
+
+// отображение идентификаторов объектов на объекты их строителей
 // отображение идентификаторов объектов на объекты их строителей
 BUILDERS = {
     'object_ball': BallBuilder(),

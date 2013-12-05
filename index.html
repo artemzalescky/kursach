@@ -75,6 +75,12 @@
                 <span>Твердое тело</span>
                 <input id="object_is_sensor" class="input" type="checkbox" checked>
 			</div>
+			<div class="select_list_panel">
+				<span style="margin-left:20px;">Повернуть объект </span>
+				<hr class="line">
+				<span title='в диапазоне от -180 до 180 градусов'>на</span>
+				<input id="object_gradus" class="input" type="number" value="0" min="-180" max="180" step="5" onChange="rotateCurrentObject();"> град    
+			</div>
 			
 			<div class="select_list_panel">
 				<span style="margin-left:20px;">Свойства жидкости</span>

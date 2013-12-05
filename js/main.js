@@ -121,6 +121,13 @@ function setupDebugDraw() {	// устанавливает настройки д�
     painter = Painter();
 }
 
+function rotateCurrentObject(){ //повернуть выделенный объект
+  if(selectedObject != null){  // есть выделенное тело
+   selectedObject.SetAngle(toRadian(document.getElementById('object_gradus').value));     
+   wakeAllBodies();
+  }
+}
+
 function update() {	// обновляем мир
     world.Step(
         1 / FPS   // частота кадров
