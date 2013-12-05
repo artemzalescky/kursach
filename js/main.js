@@ -1,3 +1,20 @@
+var buoyancyController;	// контроллер плавучести
+var debugDraw;			// отрисовщик
+
+
+var canvas;		//объект canvas (форма в html)
+var CANVAS_WIDTH;	// размеры формы, где рисуем (canvas)
+var CANVAS_HEIGHT;
+
+var world;	// объект мира
+var ground;	// тело земли
+
+
+function toMeters(pixels) {		// перевод из пикселей в метры
+    return pixels / SCALE;
+}
+
+
 function init() {		// вызывается  при загрузке страницы (основная функция)
     // настраиваем форму, где рисуем
     canvas = $('#canvas');	// элемент по id (из jquery)
@@ -12,12 +29,12 @@ function init() {		// вызывается  при загрузке страни
     setupBuoyancyController();					// настраиваем контроллер плавучести
 
     // добавляем обработчики событий
-    canvas.click(canvasClicked)
     canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
     canvas.mouseup(mouseUp);
     canvas.mousemove(mouseMove);
     pauseButton.click(pauseButtonEvent);
 
+    $('body').keypress(keyPressed); // отлавливание событий нажатия клавиш
     $('#select_list').change(inputDataChanged);
 }
 
@@ -30,10 +47,17 @@ function setupPhysics() {		// настраивает физику опыта
 }
 
 function setWorldBounds() {		// установить границы мира
-    ground = addBox(CANVAS_WIDTH / 2, CANVAS_HEIGHT, CANVAS_WIDTH, 2, true);	// создаем землю
-    addBox(CANVAS_WIDTH / 2, 0, CANVAS_WIDTH, 2, true);						// потолок
-    addBox(0, CANVAS_HEIGHT / 2, 2, CANVAS_HEIGHT, true);						// стены
-    addBox(CANVAS_WIDTH, CANVAS_HEIGHT / 2, 2, CANVAS_HEIGHT, true);
+    ground = createWorldBound(0, CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT - WORLD_BOUND_THICKNESS);	// создаем землю
+    createWorldBound(0, 0, CANVAS_WIDTH, WORLD_BOUND_THICKNESS);						// потолок
+    createWorldBound(0, 0, WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);						// стены
+    createWorldBound(CANVAS_WIDTH, 0, CANVAS_WIDTH - WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);
+}
+
+function createWorldBound(x1, y1, x2, y2) {
+    p1 = new b2Vec2(toMeters(x1), toMeters(y1));
+    p2 = new b2Vec2(toMeters(x2), toMeters(y2));
+    // получаем строитель прямоугольников и создаем границу по двум точкам
+    return BUILDERS['object_box'].build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
 }
 
 function updateGravitation() {	// обновить гравитацию

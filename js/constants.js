@@ -32,3 +32,25 @@ var CANVAS_HEIGHT;
 var world;	// объект мира
 var worldActivated = true; // запущен процесс симуляции
 var ground;	// тело земли
+
+var BODY_TYPES = {
+    'static_body': b2Body.b2_staticBody,
+    'dynamic_body': b2Body.b2_dynamicBody,
+    'kinematic_body': b2Body.b2_kinematicBody
+}
+
+// константы для клавиш, берутся из event.which
+var KEY_CODE = {
+    ENTER: 13
+}
+
+// дефенишены для границ мира
+WORLD_BOUND_FIX_DEF = new b2FixtureDef;
+WORLD_BOUND_FIX_DEF.density = 0.5;
+WORLD_BOUND_FIX_DEF.friction = 0.3;
+WORLD_BOUND_FIX_DEF.restitution = 0.5;
+
+WORLD_BOUND_BODY_DEF = new b2BodyDef;
+WORLD_BOUND_BODY_DEF.type = BODY_TYPES['static_body'];
+
+WORLD_BOUND_THICKNESS = 1;
