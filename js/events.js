@@ -4,16 +4,35 @@ var mousePressed = false;	// нажата ли кнопка мыши
 var mouseJoint = false;		// хранит соединение с мышью
 var selectedObjectBuilder = undefined;      // текущий строитель объектов
 
+var arr = [];
+var i = 0; 
+
 
 function mouseDown(event) {		// обработчик нажатия мыши
     event.preventDefault();     // отменить обычное действие события
-    mousePressed = true;		// флажок, что нажали
+	mousePressed = true;		// флажок, что кликнули
+	var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
+	
+	if(getObjectType()=="object_joint") //если выбрали соединение
+	{
+		var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
+	
+		if(body) // если тело там было
+		{
+			i++;
+			arr.push(body); //добавляем в массив объект
+			//arr.push(cursorPoint);
+			if(i == 2) //если добавили два объекта, то делаем между ними соединение
+			{
+				create_joint(arr); //функция создания соединения
+				i = 0;
+			}		
+		}
+	} else if(mouseJoint == false && getObjectType() == "object_cursor"){	// если нет соединения с курсором и мы не выбрали добавление объекта
+		event.preventDefault();
+		var body = getBodyAtPoint(cursorPoint);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
 
-    var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
-
-    if (mouseJoint == false && getObjectType() == "object_cursor") {	// если нет соединения с курсором и мы не выбрали добавление объекта
-        var body = getBodyAtPoint(cursorPoint);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
-        if (body) {	// если там было тело
+        if(body) {	// если там было тело
             var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
             def.bodyA = ground;
             def.bodyB = body;
@@ -74,7 +93,7 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
     function GetBodyCallback(fixture) {	// для перекрывающихся тел
         var shape = fixture.GetShape();
 
-        if (fixture.GetBody().GetType() != b2Body.b2_staticBody || includeStatic) {
+        if (fixture.GetBody().GetType() != includeStatic) {
             var inside = shape.TestPoint(fixture.GetBody().GetTransform(), point);	// попали ли в тело
 
             if (inside) {
@@ -116,4 +135,22 @@ function checkInputValueRange(input_object){
     } else if(parseFloat(input_object.value) > parseFloat(input_object.max)){
         input_object.value = input_object.max;
     }
+}
+
+function create_joint(arr) { // создание соединения между двумя объектами
+	//var cursorPoint1 = arr.pop();
+	var body1 = arr.pop();
+	//var cursorPoint2 = arr.pop();
+	var body2 = arr.pop();
+			
+	var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
+		def.Initialize(body2,
+		body1,
+		body2.GetWorldCenter(),
+		body1.GetWorldCenter());
+		def.length = 5;
+		def.collideConnected = true;
+		world.CreateJoint(def);
+		body1.SetAwake(true);  //будим тело 1
+		body2.SetAwake(true);  //будим тело 2
 }
