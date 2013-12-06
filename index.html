@@ -34,6 +34,7 @@
 					<option value="object_ball">Снаряд</option>
 					<option value="object_box">Ящик</option>
 					<option value="object_human">Человек</option>
+					<option value="object_delete">Удалить</option>
 					
 				</select>
 			</div>
@@ -58,6 +59,23 @@
 				<input id="water_drag" class="input" style="margin-left:40px;margin-right:7px;" type="number" value="1" min="0" max="10" step="0.2" 
 				onChange="updateWaterProperties();"> (коэф.)
 			</div>
+			
+			<div class="select_list_panel">
+				<span style="margin-left:20px;">Свойства соединения</span>
+				<hr class="line">
+				<span>Вид соединения</span>
+				<select id="add_joint_select">  
+					<option value="joint_distance">Distance</option>
+					<option value="joint_revolute">Revolute</option>
+					<option value="joint_prismatic">Prismatic</option>
+					<option value="joint_pulley">Pulley</option>
+					<option value="joint_gear"selected>Gear</option>
+				</select>
+				<hr class="line">
+				<span title='в диапазоне от 1 до 15'>Длина</span>
+				<input id="joint_length" class="input" type="number" value="5" min="1" max="15" step="1">
+			</div>
+			
 		</div>	
 				
 	</body>   
