@@ -31,10 +31,10 @@ function mouseDown(event) {		// обработчик нажатия мыши
         }
     }
     if (getActionType() == "action_delete" & getObjectType() == "object_cursor") { //если выбрали удаление
-        var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
-
-        if (body) { // если тело там было
-            world.DestroyBody(body);
+        //var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
+		selectedObject = getBodyAtPoint(cursorPoint, true);
+        if (selectedObject) { // если тело там было
+            world.DestroyBody(selectedObject);
         }
     } else if (mouseJoint == false && getObjectType() == "object_cursor" & getActionType() == "action_drag") {	// если нет соединения с курсором и мы не выбрали добавление объекта
         event.preventDefault();
