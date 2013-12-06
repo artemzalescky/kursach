@@ -1,14 +1,3 @@
-function toRadian(degrees){  // перевод из градусов в радианы (в box2d угол в радианах)
- return degrees * Math.PI/180;
-}
-
-function toDegrees(degrees){  // перевод из радианы в градусов  
- return degrees * 180/Math.PI;
-}
-
-
-
-// отображение идентификаторов объектов на объекты их строителей
 // отображение идентификаторов объектов на объекты их строителей
 BUILDERS = {
     'object_ball': BallBuilder(),
@@ -17,17 +6,17 @@ BUILDERS = {
 }
 
 /* Базовый класс строителя объектов
-    Наследники реализуют метод build, который должен создавать форму и базовую точка и вызывать _createObject.
-    Также наследники хранят публичное поле creationController которое зависит от способа конструирования объекта */
+ Наследники реализуют метод build, который должен создавать форму и базовую точка и вызывать _createObject.
+ Также наследники хранят публичное поле creationController которое зависит от способа конструирования объекта */
 function ObjectBuilder() {
     var self = {};
 
     // PROTECTED
     /* Создать объект
-        x, y - базовая точка
-        shape - форма фигуры box2d (b2Shape)
-        fixDef, bodyDef - сконфигурированные дефенишены */
-    self._createObject = function(x, y, shape, fixDef, bodyDef) {
+     x, y - базовая точка
+     shape - форма фигуры box2d (b2Shape)
+     fixDef, bodyDef - сконфигурированные дефенишены */
+    self._createObject = function (x, y, shape, fixDef, bodyDef) {
         fixDef.shape = shape;
 
         bodyDef.position.x = x;				// координаты позиции тела
@@ -38,7 +27,9 @@ function ObjectBuilder() {
         return body;
     }
 
-    self.build = function(points, fixDef, bodyDef) {throw new Error()};     // абстрактный метод
+    self.build = function (points, fixDef, bodyDef) {
+        throw new Error()
+    };     // абстрактный метод
 
     self.creationController = undefined;
 
@@ -52,8 +43,8 @@ function BallBuilder() {
     self.creationController = DragCreationController(self);
 
     /* Создать и вернуть шар.
-        points - массив из двух точек, центра и одной из точек окружности */
-    self.build = function(points, fixDef, bodyDef) {
+     points - массив из двух точек, центра и одной из точек окружности */
+    self.build = function (points, fixDef, bodyDef) {
         // получаем центр шара
         x = points[0].x;
         y = points[0].y;
@@ -78,8 +69,8 @@ function BoxBuilder() {
     self.creationController = DragCreationController(self);
 
     /* Создать и вернуть прямоугольник.
-        points - массив из двух точек которые образуют диагональ прямоугольника. */
-    self.build = function(points, fixDef, bodyDef) {
+     points - массив из двух точек которые образуют диагональ прямоугольника. */
+    self.build = function (points, fixDef, bodyDef) {
         // вычисление ширины и высоты
         width = Math.abs(points[1].x - points[0].x);
         height = Math.abs(points[1].y - points[0].y);
@@ -98,16 +89,16 @@ function BoxBuilder() {
 }
 
 /* Класс строителя многоугольников.
-    Многоугольники должны быть выпуклыми и точки должны задаваться по часовой стрелке. */
+ Многоугольники должны быть выпуклыми и точки должны задаваться по часовой стрелке. */
 function PolyBuilder() {
     var self = ObjectBuilder();
 
     self.creationController = ClickCreationController(self, 4);
 
     /* Создать и вернуть многоугольник.
-        points - массив точек многоугольника. */
-    self.build = function(points, fixDef, bodyDef) {
-        if(points.length < 3) {
+     points - массив точек многоугольника. */
+    self.build = function (points, fixDef, bodyDef) {
+        if (points.length < 3) {
             return null;
         }
 

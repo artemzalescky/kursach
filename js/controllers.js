@@ -12,7 +12,7 @@ function ObjectCreationController(objectBuilder) {
     self._objectConstructionPoints = [];    // сюда добавляются точки которые потом будут использоваться для создания объекта
 
     /* запустить создание объекта, вызывается классами-наследниками */
-    self._startObjectCreation = function() {
+    self._startObjectCreation = function () {
         var fixDef = new b2FixtureDef;
         fixDef.density = parseFloat($('#object_density').val());                // плотность
         fixDef.friction = parseFloat($('#object_friction').val());                // коэфициент трения
@@ -28,13 +28,17 @@ function ObjectCreationController(objectBuilder) {
 
     // PUBLIC поля
     /* сбросить точки */
-    self.reset = function() {
+    self.reset = function () {
         self._objectConstructionPoints = [];
     }
 
     // абстрактные методы
-    self.mouseDown = function(point) {throw new Error()};
-    self.mouseUp = function(point) {throw new Error()};
+    self.mouseDown = function (point) {
+        throw new Error()
+    };
+    self.mouseUp = function (point) {
+        throw new Error()
+    };
 
     return self;
 }
@@ -44,13 +48,13 @@ function ObjectCreationController(objectBuilder) {
 function DragCreationController(objectBuilder) {
     var self = ObjectCreationController(objectBuilder);
 
-    self.mouseDown = function(point) {
+    self.mouseDown = function (point) {
         self._objectConstructionPoints.push(point);
     }
 
-    self.mouseUp = function(point) {
+    self.mouseUp = function (point) {
         self._objectConstructionPoints.push(point);
-        if(self._objectConstructionPoints.length == 2) {
+        if (self._objectConstructionPoints.length == 2) {
             self._startObjectCreation();
         }
         self.reset();
@@ -64,14 +68,15 @@ function DragCreationController(objectBuilder) {
 function ClickCreationController(objectBuilder) {
     var self = ObjectCreationController(objectBuilder);
 
-    self.mouseDown = function(point) {}
+    self.mouseDown = function (point) {
+    }
 
-    self.mouseUp = function(point) {
+    self.mouseUp = function (point) {
         self._objectConstructionPoints.push(point);
     }
 
-    self.enterPressed = function() {
-        if(self._objectConstructionPoints) {
+    self.enterPressed = function () {
+        if (self._objectConstructionPoints) {
             self._startObjectCreation();
             self.reset();
         }
@@ -92,17 +97,17 @@ function SelectController() {
     var activeShapes = []; // список активности фигур
 
     // устанавливает стартовую точку (координаты x, y - в пикселях)
-    self.setStartPoint = function(x, y) {
+    self.setStartPoint = function (x, y) {
         startPoint.Set(toMeters(x), toMeters(y));
         endPoint.Set(toMeters(x), toMeters(y));
     }
 
-    self.setEndPoint = function(x, y) {
+    self.setEndPoint = function (x, y) {
         endPoint.Set(toMeters(x), toMeters(y));
     }
 
     // корректирует начальную и конечную точки. xMin, yMin - верхний левый угол. xMax, yMax - нижний правый
-    var correctPoints = function() {
+    var correctPoints = function () {
         var xMax = (startPoint.x >= endPoint.x) ? startPoint.x : endPoint.x;
         var xMin = (startPoint.x < endPoint.x) ? startPoint.x : endPoint.x;
         var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
@@ -113,7 +118,7 @@ function SelectController() {
 
     // активирует все фигуры для того, чтобы можно было выделить даже неактивные
     // ATTENTION! обязателен вызов в паре с deactivateShapes
-    var activateShapes = function() {
+    var activateShapes = function () {
         var shapes = world.GetBodyList();
         while (shapes) {
             activeShapes.push(shapes.IsActive());
@@ -123,7 +128,7 @@ function SelectController() {
     }
 
     // возвращает все фигуры в исходное состояние
-    var deactivateShapes = function() {
+    var deactivateShapes = function () {
         var shapes = world.GetBodyList();
         while (shapes) {
             shapes.SetActive(activeShapes.shift());
@@ -133,7 +138,7 @@ function SelectController() {
 
     // обновляет выделение
     // @param clear - очистка списка выделенных фигур (true по умолчанию)
-    self.updateSelection = function(clear) {
+    self.updateSelection = function (clear) {
         if (clear === undefined) {
             clear = true;
         }
@@ -161,17 +166,16 @@ function SelectController() {
         return selectedShapes;
     }
 
-    self.getStartPoint = function() {
+    self.getStartPoint = function () {
         return startPoint;
     }
 
-    self.getEndPoint = function() {
+    self.getEndPoint = function () {
         return endPoint;
     }
 
     return self;
 }
-
 
 function Painter() {
     var self = {};
@@ -184,17 +188,17 @@ function Painter() {
 
     var active = false;
 
-    self.drawAll = function() {
+    self.drawAll = function () {
         if (active) {
             debugDraw.DrawPolygon(selectionArea, 4, selectionColor);
         }
     }
 
-    self.setSelectionActive = function(a) {
+    self.setSelectionActive = function (a) {
         active = a;
     }
 
-    self.setSelectionArea = function(p1, p2) {
+    self.setSelectionArea = function (p1, p2) {
         selectionArea[0].x = selectionArea[3].x = p1.x;
         selectionArea[0].y = selectionArea[1].y = p1.y;
         selectionArea[1].x = selectionArea[2].x = p2.x;

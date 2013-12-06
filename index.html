@@ -10,7 +10,8 @@
 		<script type="text/javascript" src="lib/jquery-2.0.3.js"></script>
 		
 		<!-- сам javascript-код -->
-        <script type="text/javascript" src="js/constants.js"></script>
+        <script type="text/javascript" src="js/globals.js"></script>
+        <script type="text/javascript" src="js/tools.js"></script>
         <script type="text/javascript" src="js/controllers.js"></script>
 		<script type="text/javascript" src="js/objects.js"></script>
 		<script type="text/javascript" src="js/events.js"></script>
@@ -40,11 +41,11 @@
 			</div>
 			
 			<div class="select_list_panel">
-				<span>Выбрать действие</span>
+				<span>Выбрать действие курсора</span>
 				<select id="add_object_action" >  	
-					<option value="object_empty" selected></option>
-					<option value="object_joint" >Соединение</option>						
-					<option value="object_delete">удаление</option>				
+					<option value="action_drag" selected>Перетаскивание</option>
+					<option value="action_joint" >Соединение</option>
+					<option value="action_delete">Удаление</option>
 				</select>
 			</div>
 			

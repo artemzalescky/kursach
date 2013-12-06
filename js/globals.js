@@ -53,4 +53,5 @@ WORLD_BOUND_FIX_DEF.restitution = 0.5;
 WORLD_BOUND_BODY_DEF = new b2BodyDef;
 WORLD_BOUND_BODY_DEF.type = BODY_TYPES['static_body'];
 
+// толщина границ мира
 WORLD_BOUND_THICKNESS = 1;
