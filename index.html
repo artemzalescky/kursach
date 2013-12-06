@@ -4,20 +4,24 @@
 		<title>Box2dWeb</title>
 		<link href="css/style.css" rel="stylesheet" type="text/css">
 
-		<!-- форма для отрисовки -->
-		<canvas id="canvas" width="1200" height="600"></canvas>
 		
 		<!-- библиотеки -->
 		<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
 		<script type="text/javascript" src="lib/jquery-2.0.3.js"></script>
 		
 		<!-- сам javascript-код -->
+        <script type="text/javascript" src="js/globals.js"></script>
+        <script type="text/javascript" src="js/tools.js"></script>
+        <script type="text/javascript" src="js/controllers.js"></script>
 		<script type="text/javascript" src="js/objects.js"></script>
 		<script type="text/javascript" src="js/events.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	
 	<body onload="init();">
+
+        <!-- форма для отрисовки -->
+        <canvas id="canvas" width="950" height="600"></canvas>
 
 		<!-- форма для выбора объектов -->
 		<div id="select_list">
@@ -28,25 +32,56 @@
 			
 			<div class="select_list_panel">
 				<span>Выбрать объект</span>
-				<select id="add_object_select">  
-					<option value="object_cursor" selected>Курсор</option>
-					<option value="object_joint">Соединение</option>
+				<select id="add_object_select" onChange="resetSelectedObject()">  
+					<option value="object_cursor" selected>Курсор</option>					
 					<option value="object_ball">Снаряд</option>
 					<option value="object_box">Ящик</option>
 					<option value="object_human">Человек</option>
-					<option value="object_delete">Удалить</option>
-					
+                    <option value="object_poly">Многоугольник</option>					
+				</select>
+			</div>
+			
+			<div class="select_list_panel">
+				<span>Выбрать действие курсора</span>
+				<select id="add_object_action" >  	
+					<option value="action_drag" selected>Перетаскивание</option>
+					<option value="action_joint" >Соединение</option>
+					<option value="action_delete">Удаление</option>
 				</select>
 			</div>
 			
 			<div class="select_list_panel">
 				<span style="margin-left:20px;">Свойства нового объекта</span>
+
 				<hr class="line">
 				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
-				<input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1"> г/см<sup>3</sup>
+				<input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1" onChange="updateObjectProperties();"> г/см<sup>3</sup>
+
+                <hr class="line">
+                <span>Трение</span>
+                <input id="object_friction" class="input" type="number" value="0.5" min="0.1" max="1" step="0.1" onChange="updateObjectProperties();">
+
 				<hr class="line">
 				<span title='в диапазоне от 0 до 1'>Упругость</span>
-				<input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1"> (коэф.)
+				<input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1" onChange="updateObjectProperties();"> (коэф.)
+
+                <hr class="line">
+                <span>Тип тела</span>
+                <select id="object_body_type">
+                    <option value="static_body" >Статическое</option>
+                    <option value="dynamic_body"selected >Динамическое</option>
+                    <option value="kinematic_body">Кинематическое</option>
+                </select>
+
+                <hr class="line">
+                <span>Твердое тело</span>
+                <input id="object_is_sensor" class="input" type="checkbox" checked>
+			</div>
+			<div class="select_list_panel">
+				<span style="margin-left:20px;">Повернуть объект </span>
+				<hr class="line">
+				<span title='в диапазоне от -180 до 180 градусов'>на</span>
+				<input id="object_gradus" class="input" type="number" value="0" min="-180" max="180" step="5" onChange="rotateCurrentObject();"> град    
 			</div>
 			
 			<div class="select_list_panel">
@@ -76,7 +111,9 @@
 				<input id="joint_length" class="input" type="number" value="5" min="1" max="15" step="1">
 			</div>
 			
+			<input id="pause_simulation_button" type="button" value="Start/stop">
+		
 		</div>	
-				
+		
 	</body>   
 </html>
