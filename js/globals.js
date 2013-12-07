@@ -23,7 +23,6 @@ var SCALE = 30;  // пикселей в метре
 
 var buoyancyController;	// контроллер плавучести
 var debugDraw;			// отрисовщик
-var painter;
 
 var canvas;		//объект canvas (форма в html)
 var CANVAS_WIDTH;	// размеры формы, где рисуем (canvas)

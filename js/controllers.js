@@ -129,8 +129,8 @@ function SelectionController(hold_key_code) {
 
     // устанавливает стартовую точку (координаты x, y - в пикселях)
     self.mouseDown = function (point) {
-        console.log('down ', selectionPoints.length);
         selectionPoints = [point, point];
+        console.log('down ', selectionPoints.length);
     }
 
     self.mouseMove = function (point) {
@@ -152,8 +152,7 @@ function SelectionController(hold_key_code) {
             var shapesAabb = fixture.GetAABB();
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
-                body = fixture.GetBody();
-                self.selectedBodies.push();
+                self.selectedBodies.push(fixture.GetBody());
             }
             return true;
         }
@@ -161,6 +160,7 @@ function SelectionController(hold_key_code) {
         activateShapes();
         world.QueryAABB(getBodyCallback, selectedArea);
         deactivateShapes();
+        self.reset();
         console.log('selected ', self.selectedBodies.length);
     }
 
@@ -174,8 +174,8 @@ function SelectionController(hold_key_code) {
 
     // корректирует начальную и конечную точки. xMin, yMin - верхний левый угол. xMax, yMax - нижний правый
     var correctPoints = function () {
-        startPoint = selectionPoints[0];
-        endPoint = selectionPoints[1];
+        var startPoint = selectionPoints[0];
+        var endPoint = selectionPoints[1];
         var xMax = (startPoint.x >= endPoint.x) ? startPoint.x : endPoint.x;
         var xMin = (startPoint.x < endPoint.x) ? startPoint.x : endPoint.x;
         var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
@@ -210,8 +210,10 @@ function Painter() {
     var self = {};
 
     self.draw = function() {
-        self._draw(currentController.getPoints());
-        //self._draw(selectedObjectBuilder.creationController.getPoints());
+        var points = currentController.getPoints();
+        if (points.length) {
+            self._draw(points);
+        }
     }
 
     self._draw = function(points) { throw new Error; }
@@ -228,7 +230,7 @@ function SelectionPainter() {
     }
 
     self._draw = function(points) {
-        if (points) {
+        if (points.length) {
             selectionArea[0].x = selectionArea[3].x = points[0].x;
             selectionArea[0].y = selectionArea[1].y = points[0].y;
             selectionArea[1].x = selectionArea[2].x = points[1].x;
@@ -249,6 +251,8 @@ function BallContourPainter() {
         var radius = Math.sqrt(dx * dx + dy * dy);
         debugDraw.DrawCircle(points[0], radius, COLOR_CONTOUR_SHAPE);
     }
+
+    return self;
 }
 
 function PolygonContourPainter() {
@@ -259,6 +263,8 @@ function PolygonContourPainter() {
             debugDraw.DrawPolygon(points, points.length, COLOR_CONTOUR_SHAPE);
         }
     }
+
+    return self;
 }
 
 function BoxContourPainter() {

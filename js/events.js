@@ -5,6 +5,14 @@ CONTROLLERS = {
     'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3)
 }
 
+PAINTERS = {
+    'action_select' : SelectionPainter(),
+    'object_ball' : BallContourPainter(),
+    'object_box' : BoxContourPainter(),
+    'object_poly' : PolygonContourPainter()
+}
+
+var painter = PAINTERS.action_select;
 var currentController = CONTROLLERS.action_select;
 
 var mousePressed = false;	// нажата ли кнопка мыши
@@ -69,14 +77,12 @@ function mouseDown(event) {		// обработчик нажатия мыши
 //            selectedObject.SetAwake(true);	// будим тело
 //        }
 //    } else {
-    currentController.mouseDown(cursorPoint);
+        currentController.mouseDown(cursorPoint);
 //    }
-};
+}
 
 function mouseUp() {	// обработчик "отжатия" мыши
     mousePressed = false;	// флажок на "отжат"
-
-    painter.setSelectionActive(false);
 
     if (mouseJoint) {	// если курсор был соединен с телом
         world.DestroyJoint(mouseJoint);	// уничтожаем соединение
@@ -91,10 +97,6 @@ function mouseMove(event) {		// обработчик движения курсо
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));
 
     if (mousePressed) {
-        if (!mouseJoint) {
-            painter.setSelectionActive(true);
-            painter.setSelectionArea(currentController.getPoints());
-        }
         currentController.mouseMove(cursorPoint);
     }
     if (mouseJoint) {		// если есть соединение с курсором
@@ -132,9 +134,11 @@ function inputDataChanged(event) {
             case 'object_poly':
                 currentController = CONTROLLERS[objectType];
                 currentController.reset();
+                painter = PAINTERS[objectType];
                 break;
             default:
                 currentController = CONTROLLERS.action_select;
+                painter = PAINTERS.action_select;
         }
     }
 }
