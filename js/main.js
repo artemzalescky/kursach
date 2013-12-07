@@ -1,24 +1,6 @@
-var buoyancyController;	// контроллер плавучести
-var debugDraw;			// отрисовщик
-
-
-var canvas;		//объект canvas (форма в html)
-var CANVAS_WIDTH;	// размеры формы, где рисуем (canvas)
-var CANVAS_HEIGHT;
-
-var world;	// объект мира
-var ground;	// тело земли
-
-
-function toMeters(pixels) {		// перевод из пикселей в метры
-    return pixels / SCALE;
-}
-
-
 function init() {		// вызывается  при загрузке страницы (основная функция)
     // настраиваем форму, где рисуем
     canvas = $('#canvas');	// элемент по id (из jquery)
-    pauseButton = $('#pause_simulation_button');
 
     CANVAS_WIDTH = parseInt(canvas.attr('width'));		// делаем расстояния границ мира по размерам canvas
     CANVAS_HEIGHT = parseInt(canvas.attr('height'));
@@ -27,15 +9,7 @@ function init() {		// вызывается  при загрузке страни
     setupDebugDraw();							// настраиваем debug draw (стандартный отрисовщик)
     window.setInterval(update, 1000 / FPS);		// интервал обновления
     setupBuoyancyController();					// настраиваем контроллер плавучести
-
-    // добавляем обработчики событий
-    canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
-    canvas.mouseup(mouseUp);
-    canvas.mousemove(mouseMove);
-    pauseButton.click(pauseButtonEvent);
-
-    $('body').keypress(keyPressed); // отлавливание событий нажатия клавиш
-    $('#select_list').change(inputDataChanged);
+    setupEventHandlers();
 }
 
 function setupPhysics() {		// настраивает физику опыта
@@ -44,6 +18,16 @@ function setupPhysics() {		// настраивает физику опыта
     world = new b2World(gravity, allowSleeping);	// создаем мир
 
     setWorldBounds();	// устанавливаем границы мира
+}
+
+function setupEventHandlers() { // добавляем обработчики событий
+    canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
+    canvas.mouseup(mouseUp);
+    canvas.mousemove(mouseMove);
+
+    $('#pause_simulation_button').click(pauseButtonEvent);
+    $('body').keypress(keyUp); // отлавливание событий нажатия клавиш
+    $('#select_list').change(inputDataChanged);
 }
 
 function setWorldBounds() {		// установить границы мира
@@ -57,12 +41,27 @@ function createWorldBound(x1, y1, x2, y2) {
     p1 = new b2Vec2(toMeters(x1), toMeters(y1));
     p2 = new b2Vec2(toMeters(x2), toMeters(y2));
     // получаем строитель прямоугольников и создаем границу по двум точкам
-    return BUILDERS['object_box'].build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
+    return BoxBuilder().build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
 }
 
 function updateGravitation() {	// обновить гравитацию
     world.GetGravity().Set(0, 2 * document.getElementById('world_gravity').value);	// вектор гравитации
     wakeAllBodies();		// будим все тела, чтоб сразу обновилась картинка
+}
+
+function updateObjectProperties() {	// обновить свойства выделенного объекта
+    if (selectedObject != null) {		// есть выделенное тело
+        var f = selectedObject.GetFixtureList();
+        f.SetDensity(document.getElementById('object_density').value);
+        f.SetRestitution(document.getElementById('object_restitution').value);
+        f.SetFriction(document.getElementById('object_friction').value);
+
+        selectedObject.SetAwake(true);		// будим выделенное тело (чтобы сразу узреть изменения)
+    }
+}
+
+function resetSelectedObject() {
+    selectedObject = null;  // чтоб не менялись св-ва только что созданного объекта
 }
 
 function setupBuoyancyController() {	// настраиваем контроллер плавучести
@@ -105,11 +104,18 @@ function setupDebugDraw() {	// устанавливает настройки д�
     painter = Painter();
 }
 
+function rotateCurrentObject() { //повернуть выделенный объект
+    if (selectedObject != null) {  // есть выделенное тело
+        selectedObject.SetAngle(toRadian(document.getElementById('object_gradus').value));
+        wakeAllBodies();
+    }
+}
+
 function update() {	// обновляем мир
     world.Step(
-        1 / FPS   // частота кадров
-        , 10       // кол-во итераций по расчету скоростей
-        , 10       // кол-во итераций по расчету координат
+        1 / FPS,   // частота кадров
+        10,       // кол-во итераций по расчету скоростей
+        10       // кол-во итераций по расчету координат
     );
 
     world.DrawDebugData();	// все рисуем
