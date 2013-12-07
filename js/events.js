@@ -23,7 +23,6 @@ function mouseDown(event) {		// обработчик нажатия мыши
         if (body) { // если тело там было
             i++;
             arr.push(body); //добавляем в массив объект
-            //arr.push(cursorPoint);
             if (i == 2) { //если добавили два объекта, то делаем между ними соединение
                 create_joint(arr); //функция создания соединения
                 i = 0;
@@ -31,8 +30,7 @@ function mouseDown(event) {		// обработчик нажатия мыши
         }
     }
     if (getActionType() == "action_delete" & getObjectType() == "object_cursor") { //если выбрали удаление
-        //var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
-		selectedObject = getBodyAtPoint(cursorPoint, true);
+		selectedObject = getBodyAtPoint(cursorPoint, true);     // получаем тело фигуры, которая находится там где кликнули
         if (selectedObject) { // если тело там было
             world.DestroyBody(selectedObject);
         }
@@ -171,9 +169,7 @@ function checkInputValueRange(input_object) {
 }
 
 function create_joint(arr) { // создание соединения между двумя объектами
-    //var cursorPoint1 = arr.pop();
     var body1 = arr.pop();
-    //var cursorPoint2 = arr.pop();
     var body2 = arr.pop();
 
     var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
