@@ -210,8 +210,8 @@ function Painter() {
     var self = {};
 
     self.draw = function() {
-        // self._draw(selectedController.getPoint());
-        self._draw(selectedObjectBuilder.creationController.getPoints());
+        self._draw(currentController.getPoints());
+        //self._draw(selectedObjectBuilder.creationController.getPoints());
     }
 
     self._draw = function(points) { throw new Error; }
