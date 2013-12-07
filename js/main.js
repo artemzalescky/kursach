@@ -26,7 +26,7 @@ function setupEventHandlers() { // добавляем обработчики с�
     canvas.mousemove(mouseMove);
 
     $('#pause_simulation_button').click(pauseButtonEvent);
-    $('body').keypress(keyPressed); // отлавливание событий нажатия клавиш
+    $('body').keypress(keyUp); // отлавливание событий нажатия клавиш
     $('#select_list').change(inputDataChanged);
 }
 
@@ -41,7 +41,7 @@ function createWorldBound(x1, y1, x2, y2) {
     p1 = new b2Vec2(toMeters(x1), toMeters(y1));
     p2 = new b2Vec2(toMeters(x2), toMeters(y2));
     // получаем строитель прямоугольников и создаем границу по двум точкам
-    return BUILDERS['object_box'].build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
+    return BoxBuilder().build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
 }
 
 function updateGravitation() {	// обновить гравитацию
