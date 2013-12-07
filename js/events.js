@@ -1,7 +1,4 @@
- var b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef
-	,b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef	
-	,b2PulleyJointDef = Box2D.Dynamics.Joints.b2PulleyJointDef	
-	,b2GearJointDef = Box2D.Dynamics.Joints.b2GearJointDef	
+
 // обработчики событий и состояний 
 var selectController = SelectController();
 
@@ -12,9 +9,7 @@ var selectedObjectBuilder = undefined;      // текущий строитель
 var selectedObject = null;		// выделенный объект (b2Body (или null, если ни в кого не попали))
 
 var arr = [];
-var arrjoints = [];
 var i = 0; 
-
 
 function mouseDown(event) {		// обработчик нажатия мыши
     event.preventDefault();     // отменить обычное действие события
@@ -25,12 +20,11 @@ function mouseDown(event) {		// обработчик нажатия мыши
 
     if (getActionType() == "action_joint" & getObjectType() == "object_cursor") { //если выбрали соединение
        	addBodyForJoint(cursorPoint);
-    }else if (getActionType() == "action_delete" & getObjectType() == "object_cursor") { //если выбрали удаление
+    } else if (getActionType() == "action_delete" & getObjectType() == "object_cursor") { //если выбрали удаление
         var body = getBodyAtPoint(cursorPoint, true); // получаем тело фигуры, которая находится там где кликнули
 
         if (body) { // если тело там было
             world.DestroyBody(body);
-
         }
     } else if (mouseJoint == false && getObjectType() == "object_cursor" & getActionType() == "action_drag") {	// если нет соединения с курсором и мы не выбрали добавление объекта
         event.preventDefault();
@@ -188,13 +182,9 @@ function addBodyForJoint(cursorPoint)
 				}
 				i = 0;
 			}
-			else
-			{
-				if(i == 4 && jointType == 'joint_gear' ) //если добавили два объекта, то делаем между ними соединение
-				{
-					create_joint(arr);
-					i = 0;
-				}
+			else if(i == 4 && jointType == 'joint_gear' ) { //если добавили четыре объекта, то делаем между ними соединение
+				create_joint(arr);
+				i = 0;
 			}
 		}
 }
@@ -203,19 +193,17 @@ function create_joint(arr) { // создание соединения между
 
  var jointType = getJointType();	// что мы выбрали в форме соединения	
 
-	if(jointType == 'joint_gear')
-	{	
+	if(jointType == 'joint_gear') {
 		var body4 = arr.pop();
 		var body3 = arr.pop();
 		var body2 = arr.pop();
 		var body1 = arr.pop();
 	}
-	else{
-	var body1 = arr.pop();
-	var body2 = arr.pop();
+	else {
+		var body2 = arr.pop();
+		var body1 = arr.pop();
 	}
-		
-	
+			
 	if(jointType == 'joint_distance')
 		create_distance_joint(body1, body2);
 	if(jointType == 'joint_revolute')
@@ -228,40 +216,38 @@ function create_joint(arr) { // создание соединения между
 		create_gear_joint(body1, body2, body3, body4);
 		
 }
-function create_pulley_joint(body1, body2)
-{
-var anchor1 = body1.GetWorldCenter();
-var anchor2 = body2.GetWorldCenter();
- 
-var groundAnchor1 = new b2Vec2(anchor1.x, anchor1.y - (300 / SCALE)); 
-var groundAnchor2 = new b2Vec2(anchor2.x, anchor2.y - (300 / SCALE));
- 
-var ratio = 0.8;
- 
-var pulleyJointDef = new b2PulleyJointDef();
-pulleyJointDef.Initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, ratio);
-pulleyJointDef.maxLengthA = 600 / SCALE;
-pulleyJointDef.maxLengthB = 600 / SCALE;
- 
-world.CreateJoint(pulleyJointDef);
+function create_pulley_joint(body1, body2){
+
+	var anchor1 = body1.GetWorldCenter();
+	var anchor2 = body2.GetWorldCenter();
+	 
+	var groundAnchor1 = new b2Vec2(anchor1.x, anchor1.y - (300 / SCALE)); 
+	var groundAnchor2 = new b2Vec2(anchor2.x, anchor2.y - (300 / SCALE));
+	 
+	var ratio = 0.8;
+	 
+	var pulleyJointDef = new b2PulleyJointDef();
+	pulleyJointDef.Initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, ratio);
+	pulleyJointDef.maxLengthA = 600 / SCALE;
+	pulleyJointDef.maxLengthB = 600 / SCALE;
+	 
+	world.CreateJoint(pulleyJointDef);
 }
 
-function create_gear_joint(body1, body2, body3, body4)
-{
-	//var ground = this.world.GetWorldGround();
+function create_gear_joint(body1, body2, body3, body4) { //нужно 4 объекта, сначала по два связываются revolute, а потом эти два связываются gear
 	
 	var jointRevolute = new b2RevoluteJointDef();
-	jointRevolute.Initialize(body1, body2, body1.GetWorldCenter());   //new b2Vec2(ground.x, ground.y-300)
+	jointRevolute.Initialize(body1, body2, body1.GetWorldCenter());   
 	jointRevolute.enableMotor = true;
 	jointRevolute.motorSpeed = 1;
-    jointRevolute.maxMotorTorque = 2000;
+    jointRevolute.maxMotorTorque = 20;
 	var joint1 = this.world.CreateJoint(jointRevolute);
 	
 	var jointRevolute2 = new b2RevoluteJointDef();
-	jointRevolute2.Initialize(body3, body4, body3.GetWorldCenter());   //new b2Vec2(ground.x, ground.y-300)
+	jointRevolute2.Initialize(body3, body4, body3.GetWorldCenter());   
 	jointRevolute2.enableMotor = true;
-	jointRevolute2.motorSpeed = -100;
-    jointRevolute2.maxMotorTorque = 3000;
+	jointRevolute2.motorSpeed = -10;
+    jointRevolute2.maxMotorTorque = 30;
 	
 	var joint2 = this.world.CreateJoint(jointRevolute2);
 	
@@ -272,17 +258,12 @@ function create_gear_joint(body1, body2, body3, body4)
         gearJointDef.joint2 = joint2;
         gearJointDef.collideConnected = true;
         gearJointDef.ratio = 0.2;
-		//gearJointDef.Initialize(jointRevolute,jointRevolute2, body1, body2,ratio);
- 	
-	
+		
 	world.CreateJoint(gearJointDef);
-	alert("ddasd");
-	
 }
 
+function create_prismatic_joint(body1, body2) {
 
-function create_prismatic_joint(body1, body2)
-{
 	var joint = new b2PrismaticJointDef();
     joint.Initialize(body1, body2, body1.GetWorldCenter(),new b2Vec2(1,0));
     joint.lowerTranslation=-5;
@@ -294,8 +275,7 @@ function create_prismatic_joint(body1, body2)
 	this.world.CreateJoint(joint);
 }
 
-function create_revolute_joint(body1, body2)
-{
+function create_revolute_joint(body1, body2) {
 	var joint = new b2RevoluteJointDef();
     joint.Initialize(body1, body2, body1.GetWorldCenter());
 	joint.enableMotor = true;
@@ -304,19 +284,12 @@ function create_revolute_joint(body1, body2)
 	this.world.CreateJoint(joint);
 }
 
-function create_distance_joint(body1, body2)
-{
-	alert("create distance joint");
-		var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
-	
-		arrjoints.push(def);
-		def.Initialize(body1, body2, body1.GetWorldCenter(), body2.GetWorldCenter());
-		def.length = document.getElementById('joint_length').value;
-		def.collideConnected = true;
-
-		world.CreateJoint(def);
-		alert("ddsadasdsa");
-
+function create_distance_joint(body1, body2) {
+	var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
+	def.Initialize(body1, body2, body1.GetWorldCenter(), body2.GetWorldCenter());
+	def.length = document.getElementById('joint_length').value;
+	def.collideConnected = true;
+	world.CreateJoint(def);
     body1.SetAwake(true);  //будим тело 1
     body2.SetAwake(true);  //будим тело 2
 }
@@ -327,4 +300,3 @@ function pauseButtonEvent(event) {
         shape.SetActive(worldActivated);
     }
 }
-

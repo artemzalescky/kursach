@@ -1,4 +1,8 @@
-var b2Vec2 = Box2D.Common.Math.b2Vec2			// просто сокращения названий
+var b2Vec2 = Box2D.Common.Math.b2Vec2
+	, b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef
+	, b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef	
+	, b2PulleyJointDef = Box2D.Dynamics.Joints.b2PulleyJointDef	
+	, b2GearJointDef = Box2D.Dynamics.Joints.b2GearJointDef				// просто сокращения названий
     , b2AABB = Box2D.Collision.b2AABB
     , b2BodyDef = Box2D.Dynamics.b2BodyDef
     , b2Body = Box2D.Dynamics.b2Body
