@@ -32,6 +32,10 @@ function ObjectCreationController(objectBuilder) {
         self._objectConstructionPoints = [];
     }
 
+    self.getPoints = function() {
+        return self._objectConstructionPoints;
+    }
+
     // абстрактные методы
     self.mouseDown = function(point) {throw new Error()};
     self.mouseUp = function(point) {throw new Error()};
@@ -52,6 +56,7 @@ function DragCreationController(objectBuilder) {
         self._objectConstructionPoints.push(point);
         if(self._objectConstructionPoints.length == 2) {
             self._startObjectCreation();
+
         }
         self.reset();
     }
@@ -176,29 +181,73 @@ function SelectController() {
 function Painter() {
     var self = {};
 
+    self.draw = function() {
+        // self._draw(selectedController.getPoint());
+        self._draw(selectedObjectBuilder.creationController.getPoints());
+    }
+
+    self._draw = function(points) { throw new Error; }
+
+    return self;
+}
+
+function SelectionPainter() {
+    var self = Painter();
+
     var selectionArea = [];
     for (var i = 0; i < 4; i++) {
         selectionArea.push(new b2Vec2(0, 0));
     }
-    var selectionColor = new b2Color(0, 0, 0.85);
 
-    var active = false;
-
-    self.drawAll = function() {
-        if (active) {
-            debugDraw.DrawPolygon(selectionArea, 4, selectionColor);
+    self._draw = function(points) {
+        if (points) {
+            selectionArea[0].x = selectionArea[3].x = points[0].x;
+            selectionArea[0].y = selectionArea[1].y = points[0].y;
+            selectionArea[1].x = selectionArea[2].x = points[1].x;
+            selectionArea[2].y = selectionArea[3].y = points[1].y;
+            debugDraw.DrawPolygon(selectionArea, 4, COLOR_SELECTED_AREA);
         }
     }
 
-    self.setSelectionActive = function(a) {
-        active = a;
+    return self;
+}
+
+function BallContourPainter() {
+    var self = Painter();
+
+    self._draw = function(points) {
+        var dx = points[0].x - points[1].x;
+        var dy = points[0].y - points[1].y;
+        var radius = Math.sqrt(dx * dx + dy * dy);
+        debugDraw.DrawCircle(points[0], radius, COLOR_CONTOUR_SHAPE);
+    }
+}
+
+function PolygonContourPainter() {
+    var self = Painter();
+
+    self._draw = function(points) {
+        if (points.length > 2) {
+            debugDraw.DrawPolygon(points, points.length, COLOR_CONTOUR_SHAPE);
+        }
+    }
+}
+
+function BoxContourPainter() {
+    var self = Painter();
+
+    var contour = [];
+    for (var i = 0; i < 4; i++) {
+        contour.push(new b2Vec2(0, 0));
     }
 
-    self.setSelectionArea = function(p1, p2) {
-        selectionArea[0].x = selectionArea[3].x = p1.x;
-        selectionArea[0].y = selectionArea[1].y = p1.y;
-        selectionArea[1].x = selectionArea[2].x = p2.x;
-        selectionArea[2].y = selectionArea[3].y = p2.y;
+    self._draw = function(points) {
+        contour[0].x = contour[3].x = points[0].x;
+        contour[0].y = contour[1].y = points[0].y;
+        contour[1].x = contour[2].x = points[1].x;
+        contour[2].y = contour[3].y = points[1].y;
+        debugDraw.DrawPolygon(contour, 4, COLOR_CONTOUR_SHAPE);
     }
+
     return self;
 }

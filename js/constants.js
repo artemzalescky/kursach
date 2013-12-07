@@ -54,3 +54,8 @@ WORLD_BOUND_BODY_DEF = new b2BodyDef;
 WORLD_BOUND_BODY_DEF.type = BODY_TYPES['static_body'];
 
 WORLD_BOUND_THICKNESS = 1;
+
+// colors
+COLOR_SELECTED_SHAPE = new b2Color(1, 1, 0);
+COLOR_CONTOUR_SHAPE = new b2Color(0, 1, 0);
+COLOR_SELECTED_AREA = new b2Color(0, 0, 0.8);
