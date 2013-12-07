@@ -14,32 +14,8 @@ var selectedObject = null;		// выделенный объект (b2Body (или
 var arr = [];
 var arrjoints = [];
 var i = 0; 
-function canvasClicked(event) {		// обработчик клика
 
-    var x = event.offsetX,	// координаты курсора
-        y = event.offsetY;
 
-    var objectType = getObjectType();	// что мы выбрали в форме
-	var cursor = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));	
-	var body = getBodyAtPoint(cursor);	
-	
-	if(objectType == 'object_ball') {
-		addBall_expanded(x,y,20,document.getElementById('object_density').value,document.getElementById('object_restitution').value);
-	}
-	if(objectType == 'object_box') {        
-		addBox_expanded(x,y,100,50,document.getElementById('object_density').value,document.getElementById('object_restitution').value,true);
-	}
-	if(objectType == 'object_human') {        
-		addHuman_expanded(x, y, 1,document.getElementById('object_density').value,document.getElementById('object_restitution').value);
-	}
-	if(objectType == 'object_delete') {    
-		//alert("dadasd");
-		world.DestroyBody(body);
-		//addBodyForJoint(new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY)));
-	}
-}
-
-var i = 0;
 function mouseDown(event) {		// обработчик нажатия мыши
     event.preventDefault();     // отменить обычное действие события
     mousePressed = true;		// флажок, что кликнули
@@ -48,20 +24,9 @@ function mouseDown(event) {		// обработчик нажатия мыши
     selectController.setStartPoint(event.offsetX, event.offsetY);
 
     if (getActionType() == "action_joint" & getObjectType() == "object_cursor") { //если выбрали соединение
-        var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
-
-        if (body) { // если тело там было
-            i++;
-            arr.push(body); //добавляем в массив объект
-            //arr.push(cursorPoint);
-            if (i == 2) { //если добавили два объекта, то делаем между ними соединение
-                create_joint(arr); //функция создания соединения
-                i = 0;
-            }
-        }
-    }
-    if (getActionType() == "action_delete" & getObjectType() == "object_cursor") { //если выбрали удаление
-        var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
+       	addBodyForJoint(cursorPoint);
+    }else if (getActionType() == "action_delete" & getObjectType() == "object_cursor") { //если выбрали удаление
+        var body = getBodyAtPoint(cursorPoint, true); // получаем тело фигуры, которая находится там где кликнули
 
         if (body) { // если тело там было
             world.DestroyBody(body);
@@ -205,13 +170,13 @@ function checkInputValueRange(input_object) {
 }
 function addBodyForJoint(cursorPoint)
 {
-	var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
+	var body = getBodyAtPoint(cursorPoint,true); // получаем тело фигуры, которая находится там где кликнули
+		var jointType = getJointType();	// что мы выбрали в форме соединения
 		if(body) // если тело там было
 		{
 			i++;
 			arr.push(body); //добавляем в массив объект
-			//arr.push(cursorPoint);
-			if(i == 2) //если добавили два объекта, то делаем между ними соединение
+			if(i == 2 && jointType != 'joint_gear' ) //если добавили два объекта, то делаем между ними соединение
 			{
 				if(arr[0] != arr[1])
 				create_joint(arr); //функция создания соединения
@@ -221,16 +186,34 @@ function addBodyForJoint(cursorPoint)
 					arr.pop();
 				}
 				i = 0;
-			}		
+			}
+			else
+			{
+				if(i == 4 && jointType == 'joint_gear' ) //если добавили два объекта, то делаем между ними соединение
+				{
+					create_joint(arr);
+					i = 0;
+				}
+			}
 		}
 }
 
 function create_joint(arr) { // создание соединения между двумя объектами
 
+ var jointType = getJointType();	// что мы выбрали в форме соединения	
+	
+	if(jointType == 'joint_gear')
+	{	
+		var body4 = arr.pop();
+		var body3 = arr.pop();
+		var body2 = arr.pop();
+		var body1 = arr.pop();
+	}
+	else{
 	var body1 = arr.pop();
 	var body2 = arr.pop();
+	}
 		
-	 var jointType = getJointType();	// что мы выбрали в форме соединения	
 	
 	if(jointType == 'joint_distance')
 		create_distance_joint(body1, body2);
@@ -241,7 +224,7 @@ function create_joint(arr) { // создание соединения между
 	if(jointType == 'joint_pulley')
 		create_pulley_joint(body1, body2);
 	if(jointType == 'joint_gear')
-		create_gear_joint(body1, body2);
+		create_gear_joint(body1, body2, body3, body4);
 		
 }
 function create_pulley_joint(body1, body2)
@@ -262,7 +245,7 @@ pulleyJointDef.maxLengthB = 600 / SCALE;
 world.CreateJoint(pulleyJointDef);
 }
 
-function create_gear_joint(body1, body2)
+function create_gear_joint(body1, body2, body3, body4)
 {
 	//var ground = this.world.GetWorldGround();
 	
@@ -272,9 +255,6 @@ function create_gear_joint(body1, body2)
 	jointRevolute.motorSpeed = 1;
     jointRevolute.maxMotorTorque = 2000;
 	var joint1 = this.world.CreateJoint(jointRevolute);
-	
-	var body3 = addBox_expanded(300,250,100,50,document.getElementById('object_density').value,document.getElementById('object_restitution').value,true);
-	var body4 = addBall_expanded(250,300,20,document.getElementById('object_density').value,document.getElementById('object_restitution').value);
 	
 	var jointRevolute2 = new b2RevoluteJointDef();
 	jointRevolute2.Initialize(body3, body4, body3.GetWorldCenter());   //new b2Vec2(ground.x, ground.y-300)
@@ -325,14 +305,16 @@ function create_revolute_joint(body1, body2)
 
 function create_distance_joint(body1, body2)
 {
+	alert("create distance joint");
 		var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
 	
 		arrjoints.push(def);
-		def.Initialize(body2, body1, body2.GetWorldCenter(), body1.GetWorldCenter());
+		def.Initialize(body1, body2, body1.GetWorldCenter(), body2.GetWorldCenter());
 		def.length = document.getElementById('joint_length').value;
 		def.collideConnected = true;
-		world.CreateJoint(def);
 
+		world.CreateJoint(def);
+		alert("ddsadasdsa");
     body1.SetAwake(true);  //будим тело 1
     body2.SetAwake(true);  //будим тело 2
 }

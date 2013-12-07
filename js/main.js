@@ -15,9 +15,7 @@ function init() {		// вызывается  при загрузке страни
 function setupPhysics() {		// настраивает физику опыта
     var gravity = new b2Vec2(0, 10);				// вектор силы тяжести
     var allowSleeping = true;					// разрешаем телам засыпать
-    var allowSleeping = true;					// разрешаем телам засыпать
     world = new b2World(gravity, allowSleeping);	// создаем мир
-
     setWorldBounds();	// устанавливаем границы мира
 }
 
