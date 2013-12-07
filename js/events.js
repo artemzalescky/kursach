@@ -30,6 +30,7 @@ function mouseDown(event) {		// обработчик нажатия мыши
 
         if (body) { // если тело там было
             world.DestroyBody(body);
+
         }
     } else if (mouseJoint == false && getObjectType() == "object_cursor" & getActionType() == "action_drag") {	// если нет соединения с курсором и мы не выбрали добавление объекта
         event.preventDefault();
@@ -201,7 +202,7 @@ function addBodyForJoint(cursorPoint)
 function create_joint(arr) { // создание соединения между двумя объектами
 
  var jointType = getJointType();	// что мы выбрали в форме соединения	
-	
+
 	if(jointType == 'joint_gear')
 	{	
 		var body4 = arr.pop();
@@ -315,6 +316,7 @@ function create_distance_joint(body1, body2)
 
 		world.CreateJoint(def);
 		alert("ddsadasdsa");
+
     body1.SetAwake(true);  //будим тело 1
     body2.SetAwake(true);  //будим тело 2
 }
