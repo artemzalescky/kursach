@@ -1,22 +1,21 @@
 CONTROLLERS = {
-    'action_select': SelectionController(KEY_CODE.CONTROL),
+    'cursor': SelectOrMoveController(KEY_CODE.CONTROL),
     'object_ball': DragCreationController(BallBuilder()),
     'object_box': DragCreationController(BoxBuilder()),
     'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3)
 }
 
 PAINTERS = {
-    'action_select' : SelectionPainter(),
+    'cursor' : SelectionPainter(),
     'object_ball' : BallContourPainter(),
     'object_box' : BoxContourPainter(),
     'object_poly' : PolygonContourPainter()
 }
 
-var painter = PAINTERS.action_select;
-var currentController = CONTROLLERS.action_select;
+var painter = PAINTERS.cursor;
+var currentController = CONTROLLERS.cursor;
 
 var mousePressed = false;	// нажата ли кнопка мыши
-var mouseJoint = false;		// хранит соединение с мышью
 var selectedObject = null;		// выделенный объект (b2Body (или null, если ни в кого не попали))
 
 var arr = [];
@@ -24,13 +23,9 @@ var i = 0;
 
 
 function mouseDown(event) {		// обработчик нажатия мыши
-    event.preventDefault();     // отменить обычное действие события
-
     mousePressed = true;		// флажок, что кликнули
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
-
-    action_type = getActionType();
-    object_type = getObjectType();
+    currentController.mouseDown(cursorPoint);
 
 //    if (action_type == "action_joint" && object_type == "object_cursor") { //если выбрали соединение
 //        var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
@@ -50,58 +45,19 @@ function mouseDown(event) {		// обработчик нажатия мыши
 //        if (selectedObject) { // если тело там было
 //            world.DestroyBody(selectedObject);
 //        }
-//    } else
-
-//    if (mouseJoint == false && object_type == "object_cursor" & action_type == "action_drag") {	// если нет соединения с курсором и мы не выбрали добавление объекта
-//        selectedObject = getBodyAtPoint(cursorPoint, true);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
-//
-//        if (selectedObject) {	// если там было тело
-//
-//            // выводим в "Свойства объекта" св-ва выделенного объекта
-//            document.getElementById('object_density').value = selectedObject.GetFixtureList().GetDensity();
-//            document.getElementById('object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
-//            document.getElementById('object_friction').value = selectedObject.GetFixtureList().GetFriction();
-//            //для угла поворота
-//            document.getElementById('object_gradus').value = toDegrees(selectedObject.GetAngle());
-//
-//            var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
-//            def.bodyA = ground;
-//            def.bodyB = selectedObject;
-//            def.target = cursorPoint;
-//            def.collideConnected = true;
-//            def.maxForce = 10000 * selectedObject.GetMass();
-//            def.dampingRatio = 0;
-//
-//            mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
-//
-//            selectedObject.SetAwake(true);	// будим тело
-//        }
-//    } else {
-        currentController.mouseDown(cursorPoint);
 //    }
 }
 
 function mouseUp() {	// обработчик "отжатия" мыши
     mousePressed = false;	// флажок на "отжат"
-
-    if (mouseJoint) {	// если курсор был соединен с телом
-        world.DestroyJoint(mouseJoint);	// уничтожаем соединение
-        mouseJoint = false;
-    } else if (currentController) {
-        var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
-        currentController.mouseUp(cursorPoint);
-    }
+    var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
+    currentController.mouseUp(cursorPoint);
 }
 
 function mouseMove(event) {		// обработчик движения курсора
-    var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));
-
     if (mousePressed) {
+        var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));
         currentController.mouseMove(cursorPoint);
-    }
-    if (mouseJoint) {		// если есть соединение с курсором
-
-        mouseJoint.SetTarget(cursorPoint);	 // уст. новую точку курсора
     }
 }
 
@@ -133,8 +89,8 @@ function inputDataChanged(event) {
                 painter = PAINTERS[objectType];
                 break;
             default:
-                currentController = CONTROLLERS.action_select;
-                painter = PAINTERS.action_select;
+                currentController = CONTROLLERS.cursor;
+                painter = PAINTERS.cursor;
         }
     }
 }

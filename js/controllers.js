@@ -8,7 +8,7 @@ function BaseController () {
     self.keyDown = function (key_code) {};
     self.keyUp = function (key_code) {};
     self.reset = function () {};
-    self.getPoints = function () {};
+    self.getPoints = function () {return []};
 
     return self;
 }
@@ -201,6 +201,94 @@ function SelectionController(hold_key_code) {
             shapes.SetActive(activeShapes.shift());
             shapes = shapes.GetNext();
         }
+    }
+
+    return self;
+}
+
+function MoveObjectController () {
+    var self = BaseController();
+
+    var mouseJoint = null;
+
+    self.mouseDown = function (point) {
+        self.reset();
+        var selectedObject = getBodyAtPoint(point);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
+
+        if (selectedObject) {	// если там было тело
+            var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
+            def.bodyA = ground;
+            def.bodyB = selectedObject;
+            def.target = point;
+            def.collideConnected = true;
+            def.maxForce = 10000 * selectedObject.GetMass();
+            def.dampingRatio = 0;
+
+            mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
+
+            selectedObject.SetAwake(true);	// будим тело
+        }
+    }
+
+    self.mouseMove = function (point) {
+        if (mouseJoint) {		// если есть соединение с курсором
+            mouseJoint.SetTarget(point);	 // уст. новую точку курсора
+        }
+    }
+
+    self.mouseUp = function (point) {
+        self.reset();
+    }
+
+    self.reset = function () {
+        if (mouseJoint) {	// если курсор был соединен с телом
+            world.DestroyJoint(mouseJoint);	// уничтожаем соединение
+            mouseJoint = null;
+        }
+    }
+
+    return self;
+}
+
+function SelectOrMoveController (hold_key_code) {
+    var self = BaseController();
+
+    var selectionController = SelectionController(hold_key_code);
+    var moveController = MoveObjectController();
+
+    var currentController = selectionController;
+
+    self.mouseDown = function (point) {
+        if (getBodyAtPoint(point)) {
+            currentController = moveController;
+        } else {
+            currentController = selectionController;
+        }
+        currentController.mouseDown(point);
+    }
+
+    self.mouseMove = function (point) {
+        currentController.mouseMove(point);
+    }
+
+    self.mouseUp = function (point) {
+        currentController.mouseUp(point);
+    }
+
+    self.keyDown = function (key_code) {
+        currentController.keyDown(key_code);
+    }
+
+    self.keyUp = function (key_code) {
+        currentController.keyUp(key_code);
+    }
+
+    self.reset = function () {
+        currentController.reset();
+    }
+
+    self.getPoints = function () {
+        return currentController.getPoints();
     }
 
     return self;
