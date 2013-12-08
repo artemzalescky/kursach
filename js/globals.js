@@ -43,6 +43,12 @@ var KEY_CODE = {
     ENTER: 13
 }
 
+var COLORS = {
+    SELECTED_SHAPE: new b2Color(1, 1, 0),
+    CONTOUR_SHAPE: new b2Color(0, 1, 0),
+    SELECTED_AREA: new b2Color(0, 0, 0.8)
+}
+
 // дефенишены для границ мира
 WORLD_BOUND_FIX_DEF = new b2FixtureDef;
 WORLD_BOUND_FIX_DEF.density = 0.5;
@@ -54,8 +60,3 @@ WORLD_BOUND_BODY_DEF.type = BODY_TYPES['static_body'];
 
 // толщина границ мира
 WORLD_BOUND_THICKNESS = 1;
-
-// colors
-COLOR_SELECTED_SHAPE = new b2Color(1, 1, 0);
-COLOR_CONTOUR_SHAPE = new b2Color(0, 1, 0);
-COLOR_SELECTED_AREA = new b2Color(0, 0, 0.8);
