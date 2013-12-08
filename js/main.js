@@ -101,8 +101,6 @@ function setupDebugDraw() {	// устанавливает настройки д�
     debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit | b2DebugDraw.e_pairBit);	// флаги рисования фигур и соединений
 
     world.SetDebugDraw(debugDraw);
-
-    painter = Painter();
 }
 
 function rotateCurrentObject() { //повернуть выделенный объект
