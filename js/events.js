@@ -1,5 +1,5 @@
 CONTROLLERS = {
-    'action_select': SelectionController(0),
+    'action_select': SelectionController(KEY_CODE.CONTROL),
     'object_ball': DragCreationController(BallBuilder()),
     'object_box': DragCreationController(BoxBuilder()),
     'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3)
@@ -107,15 +107,11 @@ function mouseMove(event) {		// обработчик движения курсо
 
 // обработчик нажатия клавиш
 function keyDown(event) {
-    if (currentController) {
-        currentController.keyDown(event.which);
-    }
+    currentController.keyDown(event.which);
 }
 
 function keyUp(event) {
-    if (currentController) {
-        currentController.keyUp(event.which);
-    }
+    currentController.keyUp(event.which);
 }
 
 // обработчик изменения полей данных

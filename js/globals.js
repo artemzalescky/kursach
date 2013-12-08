@@ -40,7 +40,11 @@ var BODY_TYPES = {
 
 // константы для клавиш, берутся из event.which
 var KEY_CODE = {
-    ENTER: 13
+    ENTER: 13,
+    SHIFT: 16,
+    CONTROL: 17,
+    ALT: 18,
+    ESC: 27
 }
 
 var COLORS = {
