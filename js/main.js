@@ -119,7 +119,7 @@ function update() {	// обновляем мир
     );
 
     world.DrawDebugData();	// все рисуем
-    painter.drawAll();
+    painter.draw();
 
     // обработка касания с водой
     for (var currentBody = world.GetBodyList(); currentBody; currentBody = currentBody.GetNext()) {	// идем по всем телам
