@@ -1,10 +1,14 @@
 function Painter() {
     var self = {};
+    var axis = new b2Vec2(0, 0);
 
     self.draw = function() {
         var points = currentController.getPoints();
         if (points.length) {
             self._draw(points);
+            for (i = 0; i < points.length; i++) {
+                debugDraw.DrawSolidCircle(points[i], CONTOUR_POINT_RADIUS, axis, COLORS.CONTOUR_POINT);
+            }
         }
     }
 
@@ -51,7 +55,7 @@ function PolygonContourPainter() {
     var self = Painter();
 
     self._draw = function(points) {
-        if (points.length > 2) {
+        if (points.length >= 2) {
             debugDraw.DrawPolygon(points, points.length, COLORS.CONTOUR_SHAPE);
         }
     }

@@ -46,8 +46,11 @@ var KEY_CODE = {
 var COLORS = {
     SELECTED_SHAPE: new b2Color(1, 1, 0),
     CONTOUR_SHAPE: new b2Color(0, 1, 0),
+    CONTOUR_POINT: new b2Color(0, 1, 0),
     SELECTED_AREA: new b2Color(0, 0, 0.8)
 }
+
+CONTOUR_POINT_RADIUS = 0.05;
 
 // дефенишены для границ мира
 WORLD_BOUND_FIX_DEF = new b2FixtureDef;
