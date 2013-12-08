@@ -1,18 +1,26 @@
 function Painter() {
     var self = {};
-    var axis = new b2Vec2(0, 0);
+
+    var axis = new b2Vec2(0, 0);        // нужно для отрисовки точек контура
+    self.contour_points_enabled = false;
 
     self.draw = function() {
         var points = currentController.getPoints();
         if (points.length) {
             self._draw(points);
-            for (i = 0; i < points.length; i++) {
-                debugDraw.DrawSolidCircle(points[i], CONTOUR_POINT_RADIUS, axis, COLORS.CONTOUR_POINT);
+            if (self.contour_points_enabled) {
+                draw_conour_points(points);
             }
         }
     }
 
     self._draw = function(points) { throw new Error; }
+
+    var draw_conour_points = function (points) {
+        for (i = 0; i < points.length; i++) {
+            debugDraw.DrawSolidCircle(points[i], CONTOUR_POINT_RADIUS, axis, COLORS.CONTOUR_POINT);
+        }
+    }
 
     return self;
 }
@@ -38,8 +46,16 @@ function SelectionPainter() {
     return self;
 }
 
-function BallContourPainter() {
+function ObjectPainter() {
     var self = Painter();
+
+    self.contour_points_enabled = true;
+
+    return self;
+}
+
+function BallContourPainter() {
+    var self = ObjectPainter();
 
     self._draw = function(points) {
         var dx = points[0].x - points[1].x;
@@ -52,7 +68,7 @@ function BallContourPainter() {
 }
 
 function PolygonContourPainter() {
-    var self = Painter();
+    var self = ObjectPainter();
 
     self._draw = function(points) {
         if (points.length >= 2) {
@@ -64,7 +80,7 @@ function PolygonContourPainter() {
 }
 
 function BoxContourPainter() {
-    var self = Painter();
+    var self = ObjectPainter();
 
     var contour = [];
     for (var i = 0; i < 4; i++) {
