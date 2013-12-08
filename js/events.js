@@ -16,36 +16,12 @@ var painter = PAINTERS.cursor;
 var currentController = CONTROLLERS.cursor;
 
 var mousePressed = false;	// нажата ли кнопка мыши
-var selectedObject = null;		// выделенный объект (b2Body (или null, если ни в кого не попали))
-
-var arr = [];
-var i = 0;
 
 
 function mouseDown(event) {		// обработчик нажатия мыши
     mousePressed = true;		// флажок, что кликнули
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
     currentController.mouseDown(cursorPoint);
-
-//    if (action_type == "action_joint" && object_type == "object_cursor") { //если выбрали соединение
-//        var body = getBodyAtPoint(cursorPoint); // получаем тело фигуры, которая находится там где кликнули
-//
-//        if (body) { // если тело там было
-//            i++;
-//            arr.push(body); //добавляем в массив объект
-//            if (i == 2) { //если добавили два объекта, то делаем между ними соединение
-//                create_joint(arr); //функция создания соединения
-//                i = 0;
-//            }
-//        }
-//    }
-
-//    if (action_type == "action_delete" & object_type == "object_cursor") { //если выбрали удаление
-//		selectedObject = getBodyAtPoint(cursorPoint, true);     // получаем тело фигуры, которая находится там где кликнули
-//        if (selectedObject) { // если тело там было
-//            world.DestroyBody(selectedObject);
-//        }
-//    }
 }
 
 function mouseUp() {	// обработчик "отжатия" мыши
@@ -70,6 +46,31 @@ function keyUp(event) {
     currentController.keyUp(event.which);
 }
 
+function createObjectTriggered () {
+    $("#create_object_panel").slideToggle("fast");
+    isChecked = toggleButton('create_object_button');
+    switchObject(isChecked ? getObjectType() : '');
+}
+
+function switchObject(objectType) {
+    switch (objectType) {
+        case 'object_ball':
+        case 'object_box':
+        case 'object_poly':
+            currentController = CONTROLLERS[objectType];
+            currentController.reset();
+            painter = PAINTERS[objectType];
+            break;
+        default:
+            currentController = CONTROLLERS.cursor;
+            painter = PAINTERS.cursor;
+    }
+}
+
+function objectCreated() {  // вызывается сразу после создания объекта
+    createObjectTriggered();
+}
+
 // обработчик изменения полей данных
 function inputDataChanged(event) {
     // проверяем попадание в диапазон значений только для числовых инпутов
@@ -79,19 +80,7 @@ function inputDataChanged(event) {
 
     // устанавливаем строитель объектов
     if (event.target.id === 'add_object_select') {
-        objectType = getObjectType();
-        switch (objectType) {
-            case 'object_ball':
-            case 'object_box':
-            case 'object_poly':
-                currentController = CONTROLLERS[objectType];
-                currentController.reset();
-                painter = PAINTERS[objectType];
-                break;
-            default:
-                currentController = CONTROLLERS.cursor;
-                painter = PAINTERS.cursor;
-        }
+        switchObject(getObjectType());
     }
 }
 
@@ -104,26 +93,8 @@ function checkInputValueRange(input_object) {
     }
 }
 
-function create_joint(arr) { // создание соединения между двумя объектами
-    var body1 = arr.pop();
-    var body2 = arr.pop();
-
-    var def = new Box2D.Dynamics.Joints.b2DistanceJointDef();
-    def.Initialize(
-        body2,
-        body1,
-        body2.GetWorldCenter(),
-        body1.GetWorldCenter()
-    );
-    def.length = 5;
-    def.collideConnected = true;
-    world.CreateJoint(def);
-    body1.SetAwake(true);  //будим тело 1
-    body2.SetAwake(true);  //будим тело 2
-}
-
-function pauseButtonEvent(event) {
-    worldActivated = !worldActivated;
+function pauseButtonTriggered(event) {
+    worldActivated = !toggleButton('pause_simulation_button');
     for (var shape = world.GetBodyList(); shape; shape = shape.GetNext()) {
         shape.SetActive(worldActivated);
     }

@@ -30,28 +30,16 @@
 				<span>Гравитация</span>
 				<input id="world_gravity" class="input" type="number" value="10" min="1" max="50" step="1" onChange="updateGravitation();"> м/с<sup>2</sup>
 			</div>
+
+            <div id="create_object_button" class="toggle_button">Создать объект</div>
 			
-			<div class="select_list_panel">
-				<span>Выбрать объект</span>
-				<select id="add_object_select" onChange="resetSelectedObject()">  
-					<option value="object_cursor" selected>Курсор</option>					
-					<option value="object_ball">Снаряд</option>
-					<option value="object_box">Ящик</option>
-                    <option value="object_poly">Многоугольник</option>					
-				</select>
-			</div>
-			
-			<div class="select_list_panel">
-				<span>Выбрать действие курсора</span>
-				<select id="add_object_action" >  	
-					<option value="action_drag" selected>Перетаскивание</option>
-					<option value="action_joint" >Соединение</option>
-					<option value="action_delete">Удаление</option>
-				</select>
-			</div>
-			
-			<div class="select_list_panel">
-				<span style="margin-left:20px;">Свойства нового объекта</span>
+			<div id="create_object_panel" class="select_list_panel" style="display: none">
+                <span>Тип объекта</span>
+                <select id="add_object_select" onChange="resetSelectedObject()">
+                    <option value="object_ball">Снаряд</option>
+                    <option value="object_box">Ящик</option>
+                    <option value="object_poly">Многоугольник</option>
+                </select>
 
 				<hr class="line">
 				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
@@ -94,9 +82,7 @@
 				<input id="water_drag" class="input" style="margin-left:40px;margin-right:7px;" type="number" value="1" min="0" max="10" step="0.2" 
 				onChange="updateWaterProperties();"> (коэф.)
 			</div>
-            <input id="pause_simulation_button" type="button" value="Start/stop">
-		</div>	
-		
-		
+            <div id="pause_simulation_button" class="toggle_button">Пауза</div>
+		</div>
 	</body>   
 </html>

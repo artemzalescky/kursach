@@ -21,14 +21,17 @@ function setupPhysics() {		// настраивает физику опыта
 }
 
 function setupEventHandlers() { // добавляем обработчики событий
-    canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
-    canvas.mouseup(mouseUp);
-    canvas.mousemove(mouseMove);
+    $(document).ready(function() {
+        canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
+        canvas.mouseup(mouseUp);
+        canvas.mousemove(mouseMove);
 
-    $('#pause_simulation_button').click(pauseButtonEvent);
-    $('body').keydown(keyDown); // отлавливание событий нажатия клавиш
-    $('body').keyup(keyUp);
-    $('#select_list').change(inputDataChanged);
+        $('body').keydown(keyDown); // отлавливание событий нажатия клавиш
+        $('body').keyup(keyUp);
+        $("#create_object_button").click(createObjectTriggered);    // нажимаем создать объект
+        $('#select_list').change(inputDataChanged);     // выбираем тип создаваемого объекта из списка
+        $('#pause_simulation_button').click(pauseButtonTriggered);
+    });
 }
 
 function setWorldBounds() {		// установить границы мира

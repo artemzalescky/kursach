@@ -43,6 +43,7 @@ function ObjectCreationController (objectBuilder) {
         self._objectBuilder.build(self._objectConstructionPoints, fixDef, bodyDef);
 
         self.reset();
+        objectCreated();
     }
 
     // PUBLIC поля
