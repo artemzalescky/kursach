@@ -354,3 +354,11 @@ function pauseButtonEvent(event) {
         shape.SetActive(worldActivated);
     }
 }
+
+//очитска всех элементов
+function RestartButtonEvent(event) {   
+       for (var body = world.GetBodyList(); body; body = body.GetNext()) {
+           world.DestroyBody(body);
+    }
+   
+}

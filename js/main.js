@@ -24,7 +24,8 @@ function setupEventHandlers() { // добавляем обработчики с�
     canvas.mouseup(mouseUp);
     canvas.mousemove(mouseMove);
 
-    $('#pause_simulation_button').click(pauseButtonEvent);
+    $('#pause_simulation_button').click(pauseButtonEvent);	
+	$('#restart_button').click(RestartButtonEvent);
     $('body').keypress(keyPressed); // отлавливание событий нажатия клавиш
     $('#select_list').change(inputDataChanged);
 }
