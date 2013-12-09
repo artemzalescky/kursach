@@ -9,18 +9,24 @@
 
 
 ###Функции
-```
+```javascript
 function name() {
     ...
 }
 ```
+или
+```javascript
+var name = function () {
+    ...
+};
+```
 
 ###Вызов функции
-```
+```javascript
 name(arg1, arg2, arg3);
 ```
 или
-```
+```javascript
 name(
     arg1, 
     arg2, 
@@ -29,7 +35,7 @@ name(
 ```
 
 ### if
-```
+```javascript
 if (a == b) {
     ...
 } else {
@@ -38,7 +44,7 @@ if (a == b) {
 ```
 
 ### цепочка if
-```
+```javascript
 if (a == b) {
     ...
 } else if (b == c) {
@@ -49,26 +55,26 @@ if (a == b) {
 ```
 
 ### while
-```
+```javascript
 while (a == b) {
     ...
 }
 ```
 
 ### for
-```
+```javascript
 for (var a = 0; a < 10; a++) {
     ...
 }
 ```
-```
+```javascript
 for (a in b) {
     ...
 }
 ```
 
 ### операции
-```
+```javascript
 x = (a + b) * c;
 y = -a + -b;
 ```
