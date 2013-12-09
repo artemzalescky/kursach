@@ -50,10 +50,9 @@ canvas{
 
 
 /* TOGGLE BUTTON*/
-
 .toggle_button {
-    display: inline;
-    margin: 8px 2px;
+    display: inline-block;
+    margin: 2px 0;
     padding: 3px 8px;
     border: 1px solid #666;
     border-radius: 4px;

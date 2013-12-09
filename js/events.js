@@ -2,7 +2,8 @@ CONTROLLERS = {
     'cursor': SelectOrMoveController(KEY_CODE.CONTROL),
     'object_ball': DragCreationController(BallBuilder()),
     'object_box': DragCreationController(BoxBuilder()),
-    'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3)
+    'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3),
+    'distance_joint': JointCreationController(DistanceJointBuilder())
 }
 
 PAINTERS = {
@@ -14,6 +15,7 @@ PAINTERS = {
 
 var painter = PAINTERS.cursor;
 var currentController = CONTROLLERS.cursor;
+var toggledButtonId = null;
 
 var mousePressed = false;	// нажата ли кнопка мыши
 
@@ -46,29 +48,61 @@ function keyUp(event) {
     currentController.keyUp(event.which);
 }
 
-function createObjectTriggered () {
-    $("#create_object_panel").slideToggle("fast");
-    isChecked = toggleButton('create_object_button');
-    switchObject(isChecked ? getObjectType() : '');
+function slidingToggleTriggered (event) {
+    var button = $(event.target);
+    var prevToggledButtonId = toggledButtonId;
+    closeAllSlidingToggles();
+
+    if (button.attr('id') != prevToggledButtonId) {
+        toggledButtonId = button.attr('id');
+
+        var panel = button.parent().find('.toggle_panel');
+        panel.slideDown("fast");
+        button.addClass('toggle_button_enabled');
+
+        switch (button.attr('id')) {
+            case 'create_object_button':
+                switchController(getObjectType());
+                break;
+            case 'create_joint_button':
+                switchController(getJointType());
+                break;
+            default:
+                switchController();
+        }
+    }
 }
 
-function switchObject(objectType) {
-    switch (objectType) {
-        case 'object_ball':
-        case 'object_box':
-        case 'object_poly':
-            currentController = CONTROLLERS[objectType];
-            currentController.reset();
-            painter = PAINTERS[objectType];
-            break;
-        default:
-            currentController = CONTROLLERS.cursor;
-            painter = PAINTERS.cursor;
+function closeAllSlidingToggles() {
+    var block = $('#sliding_toggles_block');
+    block.find('.toggle_panel').slideUp('fast');
+    block.find('.toggle_button').removeClass('toggle_button_enabled');
+    toggledButtonId = null;
+}
+
+function switchController(controllerType) {
+    if (controllerType in CONTROLLERS) {
+        currentController = CONTROLLERS[controllerType];
+        currentController.reset();
+    } else {
+        currentController = CONTROLLERS.cursor;
+    }
+
+    if (controllerType in PAINTERS) {
+        painter = PAINTERS[controllerType];
+    } else {
+        painter = PAINTERS.cursor;
     }
 }
 
 function objectCreated() {  // вызывается сразу после создания объекта
-    createObjectTriggered();
+    closeAllSlidingToggles();
+    switchController();
+}
+
+function jointCreated() {  // вызывается сразу после создания объекта
+    closeAllSlidingToggles();
+    switchController();
 }
 
 // обработчик изменения полей данных
@@ -78,9 +112,10 @@ function inputDataChanged(event) {
         checkInputValueRange(event.target);
     }
 
-    // устанавливаем строитель объектов
     if (event.target.id === 'add_object_select') {
-        switchObject(getObjectType());
+        switchController(getObjectType());
+    } else if (event.target.id === 'joint_select') {
+        switchController(getJointType());
     }
 }
 

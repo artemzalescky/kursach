@@ -28,8 +28,8 @@ function setupEventHandlers() { // добавляем обработчики с�
 
         $('body').keydown(keyDown); // отлавливание событий нажатия клавиш
         $('body').keyup(keyUp);
-        $("#create_object_button").click(createObjectTriggered);    // нажимаем создать объект
-        $('#select_list').change(inputDataChanged);     // выбираем тип создаваемого объекта из списка
+        $("#sliding_toggles_block").find(".toggle_button").on("click", slidingToggleTriggered);    // нажимаем создать объект
+        $('#select_list').change(inputDataChanged);
         $('#pause_simulation_button').click(pauseButtonTriggered);
     });
 }

@@ -20,8 +20,8 @@ function getObjectType() {		// возвращает тип выбранного 
     return $('#add_object_select').val();
 }
 
-function getActionType() {		// возвращает действие выбранного объекта из формы
-    return $('#add_object_action').val();
+function getJointType() {		// возвращает действие выбранного объекта из формы
+    return $('#joint_select').val();
 }
 
 function getBodyAtPoint(point, includeStatic) {		// тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
@@ -48,15 +48,4 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
 
     world.QueryAABB(GetBodyCallback, aabb);
     return body;
-}
-
-function toggleButton (buttonId) {
-    selector = '#' + buttonId;
-    isChecked = $(selector).hasClass('toggle_button_enabled');
-    if (isChecked) {
-        $(selector).removeClass('toggle_button_enabled');
-    } else {
-        $(selector).addClass('toggle_button_enabled');
-    }
-    return !isChecked;
 }

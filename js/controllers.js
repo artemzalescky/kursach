@@ -294,3 +294,29 @@ function SelectOrMoveController (hold_key_code) {
 
     return self;
 }
+
+function JointCreationController (jointBuilder) {
+    var self = BaseController();
+
+    var bodies = [];
+
+    self._jointBuilder = jointBuilder;
+
+    self.mouseUp = function (point) {
+        body = getBodyAtPoint(point);
+        if (body) {
+            bodies.push(body);
+        }
+        if (bodies.length == self._jointBuilder.REQUIRED_BODIES_NUMBER) {
+            self._jointBuilder.createJoint(bodies);
+            self.reset();
+            jointCreated();
+        }
+    };
+
+    self.reset = function () {
+        bodies = [];
+    };
+
+    return self;
+}
