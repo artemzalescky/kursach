@@ -3,7 +3,8 @@ CONTROLLERS = {
     'object_ball': DragCreationController(BallBuilder()),
     'object_box': DragCreationController(BoxBuilder()),
     'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3),
-    'distance_joint': JointCreationController(DistanceJointBuilder())
+    'distance_joint': JointCreationController(DistanceJointBuilder()),
+    'revolute_joint': JointCreationController(RevoluteJointBuilder())
 }
 
 PAINTERS = {

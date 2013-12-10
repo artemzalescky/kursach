@@ -299,6 +299,7 @@ function JointCreationController (jointBuilder) {
     var self = BaseController();
 
     var bodies = [];
+    var points = [];
 
     self._jointBuilder = jointBuilder;
 
@@ -306,9 +307,10 @@ function JointCreationController (jointBuilder) {
         body = getBodyAtPoint(point);
         if (body) {
             bodies.push(body);
+            points.push(point);
         }
         if (bodies.length == self._jointBuilder.REQUIRED_BODIES_NUMBER) {
-            self._jointBuilder.createJoint(bodies);
+            self._jointBuilder.createJoint(bodies, points);
             self.reset();
             jointCreated();
         }
@@ -316,6 +318,7 @@ function JointCreationController (jointBuilder) {
 
     self.reset = function () {
         bodies = [];
+        points = [];
     };
 
     return self;
