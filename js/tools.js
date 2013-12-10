@@ -49,3 +49,14 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
     world.QueryAABB(GetBodyCallback, aabb);
     return body;
 }
+
+function toggleButton (buttonId) {
+    selector = '#' + buttonId;
+    isChecked = $(selector).hasClass('toggle_button_enabled');
+    if (isChecked) {
+        $(selector).removeClass('toggle_button_enabled');
+    } else {
+        $(selector).addClass('toggle_button_enabled');
+    }
+    return !isChecked;
+}
