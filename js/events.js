@@ -4,7 +4,8 @@ CONTROLLERS = {
     'object_box': DragCreationController(BoxBuilder()),
     'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3),
     'distance_joint': JointCreationController(DistanceJointBuilder()),
-    'revolute_joint': JointCreationController(RevoluteJointBuilder())
+    'revolute_joint': JointCreationController(RevoluteJointBuilder()),
+    'prismatic_joint': JointCreationController(PrismaticJointBuilder())
 }
 
 PAINTERS = {

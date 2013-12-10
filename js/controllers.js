@@ -38,6 +38,7 @@ function ObjectCreationController (objectBuilder) {
 
         var bodyDef = new b2BodyDef;
         bodyDef.type = BODY_TYPES[$('#object_body_type').val()];                // тип тела (static, dynamic, kinematic)
+        bodyDef.active = worldActivated;
 
         // вызываем строитель объектов
         self._objectBuilder.build(self._objectConstructionPoints, fixDef, bodyDef);
@@ -124,7 +125,6 @@ function SelectionController(hold_key_code) {
 
     var selectionPoints = [];
     var selectedArea = new b2AABB(); // выделенная область
-    var activeShapes = []; // список активности фигур
 
     self.selectedBodies = []; // список выделенных фигур
 
@@ -161,9 +161,9 @@ function SelectionController(hold_key_code) {
             return true;
         }
 
-        activateShapes();
+        var activeBodies = activateAllBodies();
         world.QueryAABB(getBodyCallback, selectedArea);
-        deactivateShapes();
+        deactivateAllBodies(activeBodies);
         self.reset();
         console.log('selected ', self.selectedBodies.length);
     }
@@ -197,26 +197,6 @@ function SelectionController(hold_key_code) {
         var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
         var yMin = (startPoint.y < endPoint.y) ? startPoint.y : endPoint.y;
         selectionPoints = [new b2Vec2(xMin, yMin), new b2Vec2(xMax, yMax)];
-    }
-
-    // активирует все фигуры для того, чтобы можно было выделить даже неактивные
-    // ATTENTION! обязателен вызов в паре с deactivateShapes
-    var activateShapes = function () {
-        var shapes = world.GetBodyList();
-        while (shapes) {
-            activeShapes.push(shapes.IsActive());
-            shapes.SetActive(true);
-            shapes = shapes.GetNext();
-        }
-    }
-
-    // возвращает все фигуры в исходное состояние
-    var deactivateShapes = function () {
-        var shapes = world.GetBodyList();
-        while (shapes) {
-            shapes.SetActive(activeShapes.shift());
-            shapes = shapes.GetNext();
-        }
     }
 
     return self;

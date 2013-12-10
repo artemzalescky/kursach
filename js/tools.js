@@ -46,8 +46,33 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
         return true;
     }
 
+    var activeBodies = activateAllBodies();
     world.QueryAABB(GetBodyCallback, aabb);
+    deactivateAllBodies(activeBodies);
+
     return body;
+}
+
+// активирует все фигуры для того, чтобы можно было выделить даже неактивные
+// ATTENTION! обязателен вызов в паре с deactivateShapes
+var activateAllBodies = function () {
+    var bodies = world.GetBodyList();
+    var activeBodies = [];
+    while (bodies) {
+        activeBodies.push(bodies.IsActive());
+        bodies.SetActive(true);
+        bodies = bodies.GetNext();
+    }
+    return activeBodies;
+}
+
+// возвращает все фигуры в исходное состояние
+var deactivateAllBodies = function (activeBodies) {
+    var bodies = world.GetBodyList();
+    while (bodies) {
+        bodies.SetActive(activeBodies.shift());
+        bodies = bodies.GetNext();
+    }
 }
 
 function toggleButton (buttonId) {

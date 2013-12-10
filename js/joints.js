@@ -54,3 +54,25 @@ function RevoluteJointBuilder () {
 
     return self;
 }
+
+function PrismaticJointBuilder () {
+    var self = JointBuilder();
+
+    axis = new b2Vec2(1, 0);
+
+    self.REQUIRED_BODIES_NUMBER = 2;
+
+    self._createJointDef = function (bodies, points) {
+        var joint = new Box2D.Dynamics.Joints.b2PrismaticJointDef();
+        joint.Initialize(bodies[0], bodies[1], points[0], axis);
+        joint.lowerTranslation = -5;
+        joint.upperTranslation = 5;
+        joint.enableLimit = true;
+        joint.maxMotorForce = 100;
+        joint.motorSpeed = 5.0;
+        joint.enableMotor = true;
+        return joint;
+    }
+
+    return self;
+}
