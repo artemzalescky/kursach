@@ -99,6 +99,10 @@ function getObjectType() {		// возвращает тип выбранного 
     return $('#add_object_select').val();
 }
 
+function setObjectType(value) {  // устанавливает тип выбранного объекта из формы
+    return $('#add_object_select').val(value);
+}
+
 function getJointType(){		//возвращает тип выбранного соединения из формы
 	return $('#add_joint_select').val();
 }
@@ -152,6 +156,7 @@ function inputDataChanged(event) {
             default:
                 selectedObjectBuiler = null;
         }
+
     }
 }
 
