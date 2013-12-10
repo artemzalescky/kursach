@@ -153,7 +153,10 @@ function SelectionController(hold_key_code) {
             var shapesAabb = fixture.GetAABB();
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
-                self.selectedBodies.push(fixture.GetBody());
+                body = fixture.GetBody();
+                if (!item_in_array(body, self.selectedBodies)) {
+                    self.selectedBodies.push(body);
+                }
             }
             return true;
         }
@@ -163,6 +166,18 @@ function SelectionController(hold_key_code) {
         deactivateShapes();
         self.reset();
         console.log('selected ', self.selectedBodies.length);
+    }
+
+    self.keyDown = function (key_code) {
+        if (key_code === hold_key_code) {
+            holding = true;
+        }
+    }
+
+    self.keyUp = function (key_code) {
+        if (key_code === hold_key_code) {
+            holding = false;
+        }
     }
 
     self.reset = function () {
