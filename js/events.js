@@ -360,5 +360,7 @@ function RestartButtonEvent(event) {
        for (var body = world.GetBodyList(); body; body = body.GetNext()) {
            world.DestroyBody(body);
     }
+	
+	setWorldBounbds(); //пересоздать границы
    
 }
