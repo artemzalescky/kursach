@@ -47,8 +47,8 @@ function RevoluteJointBuilder () {
         var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
         jointDef.Initialize(bodies[0], bodies[1], points[0]);
         jointDef.enableMotor = true;
-        jointDef.motorSpeed = 17;
-        jointDef.maxMotorTorque = 20;
+        jointDef.motorSpeed = 107;
+        jointDef.maxMotorTorque = 50;
         return jointDef;
     }
 

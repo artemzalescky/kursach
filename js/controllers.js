@@ -299,7 +299,7 @@ function JointCreationController (jointBuilder) {
     self._jointBuilder = jointBuilder;
 
     self.mouseUp = function (point) {
-        body = getBodyAtPoint(point);
+        var body = getBodyAtPoint(point, true);
         if (body) {
             bodies.push(body);
             points.push(point);
