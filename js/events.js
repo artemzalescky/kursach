@@ -27,34 +27,81 @@ function mouseDown(event) {		// обработчик нажатия мыши
             world.DestroyBody(body);
         }
     } else if (mouseJoint == false && getObjectType() == "object_cursor" & getActionType() == "action_drag") {	// если нет соединения с курсором и мы не выбрали добавление объекта
-        event.preventDefault();
-        selectedObject = getBodyAtPoint(cursorPoint, true);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
 
-        if (selectedObject) {	// если там было тело
-
-            // выводим в "Свойства объекта" св-ва выделенного объекта
-            document.getElementById('object_density').value = selectedObject.GetFixtureList().GetDensity();
-            document.getElementById('object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
-            document.getElementById('object_friction').value = selectedObject.GetFixtureList().GetFriction();
-            //для угла поворота
-            document.getElementById('object_gradus').value = toDegrees(selectedObject.GetAngle());
-
-            var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
-            def.bodyA = ground;
-            def.bodyB = selectedObject;
-            def.target = cursorPoint;
-            def.collideConnected = true;
-            def.maxForce = 10000 * selectedObject.GetMass();
-            def.dampingRatio = 0;
-
-            mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
-
-            selectedObject.SetAwake(true);	// будим тело
-        }
+        GetPropertyObject(cursorPoint);
+        
     } else if (selectedObjectBuilder) {
         selectedObjectBuilder.creationController.mouseDown(cursorPoint);
     }
 };
+
+//определение свойств объекта
+function GetPropertyObject(cursorPoint){
+
+    selectedObject = getBodyAtPoint(cursorPoint, true);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
+
+    if (selectedObject) {	// если там было тело
+
+		var shapeObject = document.getElementById('created_object_shape').value = selectedObject.GetFixtureList().GetShape().GetType();
+        switch (shapeObject) {
+            case 0:  document.getElementById('created_object_shape').value = "Снаряд"; break;
+            case 1:  document.getElementById('created_object_shape').value = "Ящик";   break;
+            default:
+                document.getElementById('created_object_shape').value = "нет данных"; break;
+        }
+
+        var typeObject = selectedObject.GetType();
+        switch (typeObject){
+            case 0:  document.getElementById('created_object_type').value = "static_body"; break;
+            case 1:  document.getElementById('created_object_type').value = "kinematic_body";   break;
+            case 2:  document.getElementById('created_object_type').value = "dynamic_body"; break;
+            default:
+                document.getElementById('created_object_type').value = "нет данных"; break;
+        }
+
+		if(shapeObject == 0){	// если круг
+			var radiusObject = selectedObject.GetFixtureList().GetShape().GetRadius();
+			document.getElementById('created_object_radius').value = Math.floor(radiusObject*10)/10;
+            document.getElementById('created_object_width').value = "";
+            document.getElementById('created_object_height').value = "";
+		}
+
+        if(shapeObject == 1){ // если прямоугольник
+            var v = selectedObject.GetFixtureList().GetShape().GetVertices();
+            document.getElementById('created_object_radius').value = "";
+            document.getElementById('created_object_width').value = Math.floor(Math.abs(v[0].x-v[1].x)*10)/10;
+            document.getElementById('created_object_height').value =  Math.floor(Math.abs(v[2].y-v[1].y)*10)/10;
+        }
+
+
+        /*
+		 //определить твёрдое тело или нет
+		if( selectedObject.GetFixtureList().IsSensor() )
+			document.getElementById('created_object_is_sensor').value = "body_is_no_sensor";
+		else
+			document.getElementById('created_object_is_sensor').value = "body_is_sensor";
+        */
+		
+        // выводим в "Свойства объекта" св-ва выделенного объекта
+        document.getElementById('created_object_density').value = selectedObject.GetFixtureList().GetDensity();
+        document.getElementById('created_object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
+        document.getElementById('created_object_friction').value = selectedObject.GetFixtureList().GetFriction();
+        //для угла поворота
+        document.getElementById('object_gradus').value = toDegrees(selectedObject.GetAngle());
+
+        var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
+        def.bodyA = ground;
+        def.bodyB = selectedObject;
+        def.target = cursorPoint;
+        def.collideConnected = true;
+        def.maxForce = 10000 * selectedObject.GetMass();
+        def.dampingRatio = 0;
+
+        mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
+
+        selectedObject.SetAwake(true);	// будим тело
+    }
+}
 
 function mouseUp() {	// обработчик "отжатия" мыши
     mousePressed = false;	// флажок на "отжат"
@@ -120,8 +167,8 @@ function getBodyAtPoint(point, includeStatic) {		// тело фигуры, на�
 
     function GetBodyCallback(fixture) {	// для перекрывающихся тел
         var shape = fixture.GetShape();
-
-        if ((fixture.GetBody().GetType() != b2Body.b2_staticBody || includeStatic) && fixture.IsSensor() == false) { // сенсоры не выделяются (чтоб тело в воде можно было выделить)
+																			// && fixture.IsSensor() == false
+        if ((fixture.GetBody().GetType() != b2Body.b2_staticBody || includeStatic) ) { // сенсоры не выделяются (чтоб тело в воде можно было выделить)
             var inside = shape.TestPoint(fixture.GetBody().GetTransform(), point);	// попали ли в тело
 
             if (inside) {
@@ -145,7 +192,8 @@ function inputDataChanged(event) {
     }
 
     // устанавливаем строитель объектов
-    if (event.target.id === 'add_object_select') {
+    if (event.target.id !== 'add_object_select') {
+    } else {
         objectType = getObjectType();
         switch (objectType) {
             case 'object_ball':
@@ -367,5 +415,4 @@ function RestartButtonEvent(event) {
     }
 	
 	setWorldBounbds(); //пересоздать границы
-   
-}
+   }

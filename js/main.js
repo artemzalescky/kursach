@@ -8,7 +8,7 @@ function init() {		// вызывается  при загрузке страни
     setupPhysics();								// настраивает физику опыта
     setupDebugDraw();							// настраиваем debug draw (стандартный отрисовщик)
     window.setInterval(update, 1000 / FPS);		// интервал обновления
-    setupBuoyancyController();					// настраиваем контроллер плавучести
+   
     setupEventHandlers();
 }
 
@@ -52,9 +52,18 @@ function updateGravitation() {	// обновить гравитацию
 function updateObjectProperties() {	// обновить свойства выделенного объекта
     if (selectedObject != null) {		// есть выделенное тело
         var f = selectedObject.GetFixtureList();
-        f.SetDensity(document.getElementById('object_density').value);
-        f.SetRestitution(document.getElementById('object_restitution').value);
-        f.SetFriction(document.getElementById('object_friction').value);
+        f.SetDensity(document.getElementById('created_object_density').value);
+        f.SetRestitution(document.getElementById('created_object_restitution').value);
+        f.SetFriction(document.getElementById('created_object_friction').value);
+
+		switch (document.getElementById('created_object_type').value){
+            case "static_body":  selectedObject.SetType(b2Body.b2_staticBody); break;
+            case "kinematic_body":  selectedObject.SetType(b2Body.b2_kinematicBody); break;
+            case "dynamic_body":  selectedObject.SetType(b2Body.b2_dynamicBody); break;
+        }
+
+	//	if(selectedObject.GetFixtureList().GetShape().GetType() == 0)
+	//		selectedObject.GetFixtureList().GetShape().SetRadius(document.getElementById('created_object_radius').value);
 
         selectedObject.SetAwake(true);		// будим выделенное тело (чтобы сразу узреть изменения)
     }
@@ -64,11 +73,11 @@ function resetSelectedObject() {
     selectedObject = null;  // чтоб не менялись св-ва только что созданного объекта
 }
 
-function setupBuoyancyController() {	// настраиваем контроллер плавучести
+function setupBuoyancyController(height) {	// настраиваем контроллер плавучести
     buoyancyController = new b2BuoyancyController();
 
     buoyancyController.normal.Set(0, -1);	// вектор нормали поверхности воды
-    buoyancyController.offset = -400 / SCALE;	// высота жидкости вдоль нормали
+    buoyancyController.offset = -height / SCALE;	// высота жидкости вдоль нормали
     buoyancyController.useDensity = true;		// используем плотность жидкости
     buoyancyController.density = 1;			// плотность
     buoyancyController.linearDrag = 2;		// линейное торможение
