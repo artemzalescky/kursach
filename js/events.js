@@ -5,7 +5,9 @@ CONTROLLERS = {
     'object_poly': VariableClicksCreationController(PolyBuilder(), 3),
     'distance_joint': JointCreationController(DistanceJointBuilder()),
     'revolute_joint': JointCreationController(RevoluteJointBuilder()),
-    'prismatic_joint': JointCreationController(PrismaticJointBuilder())
+    'prismatic_joint': JointCreationController(PrismaticJointBuilder()),
+    'gear_joint': JointCreationController(GearJointBuilder()),
+    'pulley_joint': JointCreationController(PulleyJointBuilder())
 }
 
 PAINTERS = {
