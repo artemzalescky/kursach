@@ -5,8 +5,7 @@ function BaseController () {
     self.mouseDown = function (point) {};
     self.mouseMove = function (point) {};
     self.mouseUp = function (point) {};
-    self.keyDown = function (key_code) {};
-    self.keyUp = function (key_code) {};
+    self.keyPressed = function () {};
     self.reset = function () {};
     self.getPoints = function () {return []};
 
@@ -83,7 +82,7 @@ function DragCreationController(objectBuilder) {
 }
 
 /* Класс контроллера создания объектов по любому числу точек. */
-function VariableClicksCreationController(objectBuilder, finishKeyCode, minPointsNumber) {
+function VariableClicksCreationController(objectBuilder, minPointsNumber) {
     var self = ObjectCreationController(objectBuilder);
 
     if (minPointsNumber === undefined) {
@@ -94,8 +93,10 @@ function VariableClicksCreationController(objectBuilder, finishKeyCode, minPoint
         self._objectConstructionPoints.push(point);
     }
 
-    self.keyUp = function (key_code) {
-        if (key_code === finishKeyCode && self._objectConstructionPoints.length >= minPointsNumber) {
+    self.keyPressed = function () {
+        if (keyController.isActive(KEY_COMBINATIONS.FINISH) &&
+            self._objectConstructionPoints.length >= minPointsNumber)
+        {
             self._startObjectCreation();
         }
     }
@@ -118,7 +119,7 @@ function FixedClicksCreationController(objectBuilder, pointsNumber) {
 }
 
 // контроллер выделения фигур
-function SelectionController(hold_key_code) {
+function SelectionController () {
     var self = BaseController();
 
     var holding = false;        // зажата ли клавиша сохранения выделенных объектов
@@ -141,7 +142,7 @@ function SelectionController(hold_key_code) {
 
     self.mouseUp = function (point) {
         console.log('up ', selectionPoints.length);
-        if (!holding) {
+        if (!keyController.isActive(KEY_COMBINATIONS.HOLD_SELECTION)) {
             self.selectedBodies = [];
         }
 
@@ -154,9 +155,7 @@ function SelectionController(hold_key_code) {
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
                 body = fixture.GetBody();
-                if (!item_in_array(body, self.selectedBodies)) {
-                    self.selectedBodies.push(body);
-                }
+                addBodyToSelected(body);
             }
             return true;
         }
@@ -168,15 +167,16 @@ function SelectionController(hold_key_code) {
         console.log('selected ', self.selectedBodies.length);
     }
 
-    self.keyDown = function (key_code) {
-        if (key_code === hold_key_code) {
-            holding = true;
-        }
-    }
-
-    self.keyUp = function (key_code) {
-        if (key_code === hold_key_code) {
-            holding = false;
+    self.keyPressed = function () {
+        if (keyController.isActive(KEY_COMBINATIONS.DELETE)) {
+            deleteObjects(self.selectedBodies);
+            self.reset();
+        } else if (keyController.isActive(KEY_COMBINATIONS.SELECT_ALL)) {
+            var body = world.GetBodyList();
+            while (body) {
+                addBodyToSelected(body);
+                body = body.GetNext();
+            }
         }
     }
 
@@ -186,6 +186,12 @@ function SelectionController(hold_key_code) {
 
     self.getPoints = function () {
         return selectionPoints;
+    }
+
+    var addBodyToSelected = function (body) {
+        if (!itemInArray(body, self.selectedBodies) && !itemInArray(body, worldBounds)) {
+            self.selectedBodies.push(body);
+        }
     }
 
     // корректирует начальную и конечную точки. xMin, yMin - верхний левый угол. xMax, yMax - нижний правый
@@ -246,10 +252,10 @@ function MoveObjectController () {
     return self;
 }
 
-function SelectOrMoveController (hold_key_code) {
+function SelectOrMoveController () {
     var self = BaseController();
 
-    var selectionController = SelectionController(hold_key_code);
+    var selectionController = SelectionController();
     var moveController = MoveObjectController();
 
     var currentController = selectionController;
@@ -271,12 +277,8 @@ function SelectOrMoveController (hold_key_code) {
         currentController.mouseUp(point);
     }
 
-    self.keyDown = function (key_code) {
-        currentController.keyDown(key_code);
-    }
-
-    self.keyUp = function (key_code) {
-        currentController.keyUp(key_code);
+    self.keyPressed = function () {
+        currentController.keyPressed();
     }
 
     self.reset = function () {

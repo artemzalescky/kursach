@@ -1,6 +1,6 @@
 /* В этот файл помещать небольшиие вспомогательные функции */
 
-function item_in_array (item, arr) {
+function itemInArray (item, arr) {
     return arr.indexOf(item) != -1;
 }
 
@@ -84,4 +84,10 @@ function toggleButton (buttonId) {
         $(selector).addClass('toggle_button_enabled');
     }
     return !isChecked;
+}
+
+function deleteObjects (bodies) {
+    for (i = 0; i < bodies.length; i++) {
+        world.DestroyBody(bodies[i]);
+    }
 }

@@ -1,8 +1,8 @@
 CONTROLLERS = {
-    'cursor': SelectOrMoveController(KEY_CODE.CONTROL),
+    'cursor': SelectOrMoveController(),
     'object_ball': DragCreationController(BallBuilder()),
     'object_box': DragCreationController(BoxBuilder()),
-    'object_poly': VariableClicksCreationController(PolyBuilder(), KEY_CODE.ENTER, 3),
+    'object_poly': VariableClicksCreationController(PolyBuilder(), 3),
     'distance_joint': JointCreationController(DistanceJointBuilder()),
     'revolute_joint': JointCreationController(RevoluteJointBuilder()),
     'prismatic_joint': JointCreationController(PrismaticJointBuilder())
@@ -18,6 +18,7 @@ PAINTERS = {
 var painter = PAINTERS.cursor;
 var currentController = CONTROLLERS.cursor;
 var toggledButtonId = null;
+keyController = KeysController();
 
 var mousePressed = false;	// нажата ли кнопка мыши
 
@@ -42,12 +43,13 @@ function mouseMove(event) {		// обработчик движения курсо
 }
 
 // обработчик нажатия клавиш
-function keyDown(event) {
-    currentController.keyDown(event.which);
+function keyDown (event) {
+    keyController.keyPressed(event);
+    currentController.keyPressed();
 }
 
-function keyUp(event) {
-    currentController.keyUp(event.which);
+function keyUp (event) {
+    keyController.keyUp(event);
 }
 
 function slidingToggleTriggered (event) {

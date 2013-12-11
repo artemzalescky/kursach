@@ -31,6 +31,7 @@ var CANVAS_HEIGHT;
 var world;	// объект мира
 var worldActivated = true; // запущен процесс симуляции
 var ground;	// тело земли
+var worldBounds;
 
 var BODY_TYPES = {
     'static_body': b2Body.b2_staticBody,
@@ -39,13 +40,30 @@ var BODY_TYPES = {
 }
 
 // константы для клавиш, берутся из event.which
-var KEY_CODE = {
+var KEYS = {
     ENTER: 13,
     SHIFT: 16,
     CONTROL: 17,
     ALT: 18,
-    ESC: 27
-}
+    ESC: 27,
+    DELETE: 46,
+    A: 65
+};
+
+var MODIFIERS = {
+    SHIFT: 1,
+    CONTROL: 2,
+    ALT: 4
+};
+
+var KEY_COMBINATIONS = {
+    SELECT_ALL: [MODIFIERS.CONTROL, KEYS.A],
+    HOLD_SELECTION: [MODIFIERS.CONTROL, null],
+    FINISH: [0, KEYS.ENTER],
+    DELETE: [0, KEYS.DELETE]
+};
+
+var keyController;
 
 var COLORS = {
     SELECTED_SHAPE: new b2Color(1, 1, 0),

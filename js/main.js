@@ -36,9 +36,10 @@ function setupEventHandlers() { // добавляем обработчики с�
 
 function setWorldBounds() {		// установить границы мира
     ground = createWorldBound(0, CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT - WORLD_BOUND_THICKNESS);	// создаем землю
-    createWorldBound(0, 0, CANVAS_WIDTH, WORLD_BOUND_THICKNESS);						// потолок
-    createWorldBound(0, 0, WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);						// стены
-    createWorldBound(CANVAS_WIDTH, 0, CANVAS_WIDTH - WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);
+    var top = createWorldBound(0, 0, CANVAS_WIDTH, WORLD_BOUND_THICKNESS);						// потолок
+    var left = createWorldBound(0, 0, WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);						// стены
+    var right = createWorldBound(CANVAS_WIDTH, 0, CANVAS_WIDTH - WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);
+    worldBounds = [ground, top, left, right];
 }
 
 function createWorldBound(x1, y1, x2, y2) {
