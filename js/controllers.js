@@ -24,6 +24,7 @@ function ObjectCreationController(objectBuilder) {
 
         // вызываем строитель объектов
         self._objectBuilder.build(self._objectConstructionPoints, fixDef, bodyDef);
+        setObjectType('object_cursor');
     }
 
     // PUBLIC поля
