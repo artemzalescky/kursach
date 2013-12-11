@@ -48,6 +48,12 @@ function ObjectCreationController (objectBuilder) {
 
     // PUBLIC поля
 
+    self.keyPressed = function () {
+        if (keyController.isActive(KEY_COMBINATIONS.BREAK)) {
+            self.reset();
+        }
+    }
+
     /* сбросить точки */
     self.reset = function () {
         self._objectConstructionPoints = [];
@@ -93,11 +99,14 @@ function VariableClicksCreationController(objectBuilder, minPointsNumber) {
         self._objectConstructionPoints.push(point);
     }
 
+    var superKeyPressed = self.keyPressed;
     self.keyPressed = function () {
         if (keyController.isActive(KEY_COMBINATIONS.FINISH) &&
             self._objectConstructionPoints.length >= minPointsNumber)
         {
             self._startObjectCreation();
+        } else {
+            superKeyPressed();
         }
     }
 
@@ -167,6 +176,7 @@ function SelectionController () {
         console.log('selected ', self.selectedBodies.length);
     }
 
+    var superKeyPressed = self.keyPressed;
     self.keyPressed = function () {
         if (keyController.isActive(KEY_COMBINATIONS.DELETE)) {
             deleteObjects(self.selectedBodies);
@@ -177,6 +187,8 @@ function SelectionController () {
                 addBodyToSelected(body);
                 body = body.GetNext();
             }
+        } else {
+            superKeyPressed();
         }
     }
 
