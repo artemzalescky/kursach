@@ -86,16 +86,16 @@ function closeAllSlidingToggles() {
     toggledButtonId = null;
 }
 
-function switchController(controllerType) {
-    if (controllerType in CONTROLLERS) {
-        currentController = CONTROLLERS[controllerType];
+function switchController(objectType) {
+    if (objectType in CONTROLLERS) {
+        currentController = CONTROLLERS[objectType];
         currentController.reset();
     } else {
         currentController = CONTROLLERS.cursor;
     }
 
-    if (controllerType in PAINTERS) {
-        painter = PAINTERS[controllerType];
+    if (objectType in PAINTERS) {
+        painter = PAINTERS[objectType];
     } else {
         painter = PAINTERS.cursor;
     }

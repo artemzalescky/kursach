@@ -123,6 +123,15 @@ function update() {	// обновляем мир
 
     world.DrawDebugData();	// все рисуем
     painter.draw();
+//    console.log(world.GetBodyCount() + ' count');
+
+    var body = world.GetBodyList();
+    while (body) {
+        if (body.userData) {
+            body.userData.draw();
+        }
+        body = body.GetNext();
+    }
 
     // обработка касания с водой
     for (var currentBody = world.GetBodyList(); currentBody; currentBody = currentBody.GetNext()) {	// идем по всем телам

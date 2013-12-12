@@ -16,7 +16,8 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2			// просто сокращения н�
     , b2Settings = Box2D.Common.b2Settings
     , b2ContactFilter = Box2D.Dynamics.b2ContactFilter
     , b2BuoyancyController = Box2D.Dynamics.Controllers.b2BuoyancyController
-    , b2Color = Box2D.Common.b2Color;
+    , b2Color = Box2D.Common.b2Color
+    , b2Math = Box2D.Common.Math.b2Math;
 
 var FPS = 60; 	// отрисовка (кадров в секунду)
 var SCALE = 30;  // пикселей в метре

@@ -3,6 +3,7 @@
  Также наследники хранят публичное поле creationController которое зависит от способа конструирования объекта */
 function ObjectBuilder() {
     var self = {};
+    self._objectView = null;
 
     // PROTECTED
     /* Создать объект
@@ -17,6 +18,7 @@ function ObjectBuilder() {
 
         var body = world.CreateBody(bodyDef);	// создаем тело
         body.CreateFixture(fixDef);				// прикрепляем к телу фигуру
+        body.userData = self._objectView(body); // устанавливаем отрисовщик
         return body;
     }
 
@@ -32,6 +34,7 @@ function ObjectBuilder() {
 /* Класс строителя шаров */
 function BallBuilder() {
     var self = ObjectBuilder();
+    self._objectView = BallView;
 
     /* Создать и вернуть шар.
      points - массив из двух точек, центра и одной из точек окружности */
@@ -56,6 +59,7 @@ function BallBuilder() {
 /* Класс строителя прямоугольников */
 function BoxBuilder() {
     var self = ObjectBuilder();
+    self._objectView = PolygonView;
 
     /* Создать и вернуть прямоугольник.
      points - массив из двух точек которые образуют диагональ прямоугольника. */
@@ -81,6 +85,7 @@ function BoxBuilder() {
  Многоугольники должны быть выпуклыми и точки должны задаваться по часовой стрелке. */
 function PolyBuilder() {
     var self = ObjectBuilder();
+    self._objectView = PolygonView;
 
     /* Создать и вернуть многоугольник.
      points - массив точек многоугольника. */

@@ -9,14 +9,14 @@ function Painter() {
         if (points.length) {
             self._draw(points);
             if (self.contour_points_enabled) {
-                draw_conour_points(points);
+                draw_contour_points(points);
             }
         }
     }
 
     self._draw = function(points) { throw new Error; }
 
-    var draw_conour_points = function (points) {
+    var draw_contour_points = function (points) {
         for (i = 0; i < points.length; i++) {
             debugDraw.DrawSolidCircle(points[i], CONTOUR_POINT_RADIUS, axis, COLORS.CONTOUR_POINT);
         }
@@ -93,6 +93,54 @@ function BoxContourPainter() {
         contour[1].x = contour[2].x = points[1].x;
         contour[2].y = contour[3].y = points[1].y;
         debugDraw.DrawPolygon(contour, 4, COLORS.CONTOUR_SHAPE);
+    }
+
+    return self;
+}
+
+/* Класс, инкапсулирующий ифнормацию для отрисовки фигуры */
+function ShapeView(body, color) {
+    var self = {};
+    self._body = body;
+    self._isSelected = false;
+
+    self._color = new b2Color(Math.random(), Math.random(), Math.random());
+//    self._color = color;
+//    self._color = new b2Color(0, 0, 0);
+
+    self.draw = function() { throw new Error; }
+
+    self.setSelected = function(selected) {
+        self._isSelected = selected;
+    }
+
+    return self;
+}
+
+function BallView(body, color) {
+    var self = ShapeView(body, color);
+
+    self.draw = function() {
+        var shape = self._body.GetFixtureList().GetShape();
+        debugDraw.DrawSolidCircle(self._body.GetPosition(), shape.GetRadius(), new b2Vec2(0, 0), self._color);
+    }
+
+    return self;
+}
+
+function PolygonView(body, points, color) {
+    var self = ShapeView(body, color);
+
+    self.draw = function() {
+        var shape = self._body.GetFixtureList().GetShape();
+        var localVertices = shape.GetVertices();
+        var transform = self._body.GetTransform();
+        var vertices = [];
+        for (var i = 0; i < shape.GetVertexCount(); ++i) {
+            vertices.push(b2Math.MulX(transform, localVertices[i]));
+        }
+        debugDraw.DrawSolidPolygon(vertices, vertices.length, self._color);
+
     }
 
     return self;
