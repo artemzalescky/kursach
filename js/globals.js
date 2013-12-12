@@ -68,7 +68,7 @@ var KEY_COMBINATIONS = {
 var keyController;
 
 var COLORS = {
-    SELECTED_SHAPE: new b2Color(1, 1, 0),
+    SELECTED_SHAPE: new b2Color(0, 0, 0.7),
     CONTOUR_SHAPE: new b2Color(0, 1, 0),
     CONTOUR_POINT: new b2Color(0, 1, 0),
     SELECTED_AREA: new b2Color(0, 0, 0.8)

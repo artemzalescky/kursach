@@ -122,7 +122,7 @@ function update() {	// обновляем мир
     );
 
     world.DrawDebugData();	// все рисуем
-    painter.draw();
+    painter.draw(); // отрисовываем контуры создаваемых фигур
 //    console.log(world.GetBodyCount() + ' count');
 
     var body = world.GetBodyList();

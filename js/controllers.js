@@ -152,6 +152,9 @@ function SelectionController () {
     self.mouseUp = function (point) {
         console.log('up ', selectionPoints.length);
         if (!keyController.isActive(KEY_COMBINATIONS.HOLD_SELECTION)) {
+            for (var i = 0; i < self.selectedBodies.length; ++i) {
+                self.selectedBodies[i].userData.setSelected(false);
+            }
             self.selectedBodies = [];
         }
 
@@ -163,7 +166,7 @@ function SelectionController () {
             var shapesAabb = fixture.GetAABB();
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
-                body = fixture.GetBody();
+                var body = fixture.GetBody();
                 addBodyToSelected(body);
             }
             return true;
@@ -203,6 +206,7 @@ function SelectionController () {
     var addBodyToSelected = function (body) {
         if (!itemInArray(body, self.selectedBodies) && !itemInArray(body, worldBounds)) {
             self.selectedBodies.push(body);
+            body.userData.setSelected(true);
         }
     }
 
@@ -273,7 +277,8 @@ function SelectOrMoveController () {
     var currentController = selectionController;
 
     self.mouseDown = function (point) {
-        if (getBodyAtPoint(point)) {
+        // если есть уже выделенные фигуры, то можем выделять selectController'ом
+        if (getBodyAtPoint(point) && !selectionController.selectedBodies.length) {
             currentController = moveController;
         } else {
             currentController = selectionController;

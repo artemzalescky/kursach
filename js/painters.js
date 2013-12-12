@@ -121,8 +121,9 @@ function BallView(body, color) {
     var self = ShapeView(body, color);
 
     self.draw = function() {
+        var color = (self._isSelected) ? COLORS.SELECTED_SHAPE : self._color;
         var shape = self._body.GetFixtureList().GetShape();
-        debugDraw.DrawSolidCircle(self._body.GetPosition(), shape.GetRadius(), new b2Vec2(0, 0), self._color);
+        debugDraw.DrawSolidCircle(self._body.GetPosition(), shape.GetRadius(), new b2Vec2(0, 0), color);
     }
 
     return self;
@@ -132,6 +133,7 @@ function PolygonView(body, points, color) {
     var self = ShapeView(body, color);
 
     self.draw = function() {
+        var color = (self._isSelected) ? COLORS.SELECTED_SHAPE : self._color;
         var shape = self._body.GetFixtureList().GetShape();
         var localVertices = shape.GetVertices();
         var transform = self._body.GetTransform();
@@ -139,7 +141,7 @@ function PolygonView(body, points, color) {
         for (var i = 0; i < shape.GetVertexCount(); ++i) {
             vertices.push(b2Math.MulX(transform, localVertices[i]));
         }
-        debugDraw.DrawSolidPolygon(vertices, vertices.length, self._color);
+        debugDraw.DrawSolidPolygon(vertices, vertices.length, color);
 
     }
 
