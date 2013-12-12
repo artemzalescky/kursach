@@ -104,8 +104,8 @@ function ShapeView(body, color) {
     self._body = body;
     self._isSelected = false;
 
-    self._color = new b2Color(Math.random(), Math.random(), Math.random());
-//    self._color = color;
+//    self._color = new b2Color(Math.random(), Math.random(), Math.random());
+    self._color = color;
 //    self._color = new b2Color(0, 0, 0);
 
     self.draw = function() { throw new Error; }
@@ -129,7 +129,7 @@ function BallView(body, color) {
     return self;
 }
 
-function PolygonView(body, points, color) {
+function PolygonView(body, color) {
     var self = ShapeView(body, color);
 
     self.draw = function() {

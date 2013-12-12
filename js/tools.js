@@ -91,3 +91,11 @@ function deleteObjects (bodies) {
         world.DestroyBody(bodies[i]);
     }
 }
+
+function hexToRgb(hex) {
+    hex = (hex.charAt(0) == "#") ? hex.substring(1,7) : hex;
+    var r = parseInt(hex.substring(0, 2), 16) / 255;
+    var g = parseInt(hex.substring(2, 4), 16) / 255;
+    var b = parseInt(hex.substring(4, 6), 16) / 255;
+    return new b2Color(r, g, b);
+}
