@@ -12,7 +12,10 @@
 		<!-- сам javascript-код -->
         <script type="text/javascript" src="js/globals.js"></script>
         <script type="text/javascript" src="js/tools.js"></script>
+        <script type="text/javascript" src="js/keys.js"></script>
         <script type="text/javascript" src="js/controllers.js"></script>
+        <script type="text/javascript" src="js/painters.js"></script>
+        <script type="text/javascript" src="js/joints.js"></script>
 		<script type="text/javascript" src="js/objects.js"></script>
 		<script type="text/javascript" src="js/events.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
@@ -27,42 +30,52 @@
 		<div id="select_list">
 			<div class="select_list_panel">
 				<span>Гравитация</span>
-				<input id="world_gravity" class="input" type="number" value="10" min="-50" max="50" step="1" onChange="updateGravitation();"> м/с<sup>2</sup>
-			</div>
-			
-			<div class="select_list_panel">
-				<span>Выбрать объект</span>
-				<select id="add_object_select" onChange="resetSelectedObject()">  
+				<input id="world_gravity" class="input" type="number" value="10" min="1" max="50" step="1" onChange="updateGravitation();"> м/с<sup>2</sup>
+            </div>
+
+            <div class="select_list_panel">
+                <span style="margin-left:20px;">Свойства жидкости</span>
+                <hr class="line">
+                <span title='в диапазоне от 0,1 до 15'>Плотность</span>
+                <input id="water_density" class="input" type="number" value="1" min="0.1" max="15" step="0.1" onChange="updateWaterProperties();"> г/см<sup>3</sup>
+                <hr class="line">
+                <span title='в диапазоне от 0 до 10'>Вязкость</span>
+                <input id="water_drag" class="input" style="margin-left:40px;margin-right:7px;" type="number" value="1" min="0" max="10" step="0.2"
+                onChange="updateWaterProperties();"> (коэф.)
+            </div>
+
+            <div id="sliding_toggles_block">
+                <div>
+                    <div id="create_object_button" class="toggle_button">Создать объект</div><br>
+                    <div id="create_object_panel" class="select_list_panel toggle_panel" style="display: none">
+                    <span>Тип объекта</span>
+                    <select id="add_object_select" onChange="resetSelectedObject()">
 					<option value="object_cursor" selected>Курсор</option>					
-					<option value="object_ball">Снаряд</option>
-					<option value="object_box">Ящик</option>
-				    <option value="object_poly">Многоугольник</option>					
-				</select>
+                        <option value="object_ball">Снаряд</option>
+                        <option value="object_box">Ящик</option>
+                        <option value="object_poly">Многоугольник</option>
+                    </select>
+                </div>
 			</div>
-			
-			<div class="select_list_panel">
-				<span>Выбрать действие курсора</span>
-				<select id="add_object_action" >  
-					<option value="action_drag" selected>Перемещение</option>	
-					<option value="action_joint">Соединение</option>
-					<option value="action_delete">Удаление</option>
-				</select>
-			</div>
-			
+
+            <hr class="line">
+            <span>Цвет объекта</span>
+            <input type="color" id="object_color">
+
 			<div class="select_list_panel">
 				<span style="margin-left:20px;">Свойства нового объекта</span>
 
-				<hr class="line">
-				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
-				<input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1" > г/см<sup>3</sup>
+                <hr class="line">
+                <span title='в диапазоне от 0,1 до 15'>Плотность</span>
+                <input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1" onChange="updateObjectProperties();"> г/см<sup>3</sup>
 
                 <hr class="line">
                 <span>Трение</span>
-                <input id="object_friction" class="input" type="number" value="0.5" min="0.1" max="1" step="0.1" >
+                <input id="object_friction" class="input" type="number" value="0.5" min="0.1" max="1" step="0.1" onChange="updateObjectProperties();">
 
-				<hr class="line">
-				<span title='в диапазоне от 0 до 1'>Упругость</span>
-				<input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1" > (коэф.)
+                <hr class="line">
+                <span title='в диапазоне от 0 до 1'>Упругость</span>
+                <input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1" onChange="updateObjectProperties();"> (коэф.)
 
                 <hr class="line">
                 <span>Тип тела</span>
@@ -75,11 +88,31 @@
                 <hr class="line">
                 <span>Твердое тело</span>
                 <input id="object_is_sensor" class="input" type="checkbox" checked>
-			</div>
-			<!-- ----------------------------------------------------------------------------------------------------  -->
-			
-
+            </div>
 			<div class="select_list_panel">
+				<span style="margin-left:20px;">Повернуть объект </span>
+				<hr class="line">
+				<span title='в диапазоне от -180 до 180 градусов'>на</span>
+				<input id="object_gradus" class="input" type="number" value="0" min="-180" max="180" step="5" onChange="rotateCurrentObject();"> град    
+            </div>
+
+            <div>
+                <div id="create_joint_button" class="toggle_button">Создать соединение</div><br>
+                <div  id="create_joint_panel" class="select_list_panel toggle_panel" style="display: none">
+                    <span>Тип соединения</span>
+                    <select id="joint_select">
+                        <option value="distance_joint">Distance</option>
+                        <option value="revolute_joint">Revolute</option>
+                        <option value="prismatic_joint">Prismatic</option>
+                        <option value="gear_joint">Gear</option>
+                        <option value="pulley_joint">Pulley</option>
+                    </select>
+                    <hr class="line">
+                    <span title='в диапазоне от 1 до 15'>Длина</span>
+                    <input id="joint_length" class="input" type="number" value="5" min="1" max="15" step="1">
+                </div>
+            </div>
+            <div class="select_list_panel">
 				<span style="margin-left:1px;">Свойства созданного объекта</span>
               
                 <hr class="line">
@@ -127,51 +160,8 @@
 				<span title='в диапазоне от 0 до 1'>Упругость</span>
 				<input id="created_object_restitution" class="input" type="number" min="0" max="1" step="0.1" onChange="updateObjectProperties();"> (коэф.) 
 				
-			</div>			
-			
-			
-			<!-- ------------------------------------------------------------------------------------------------------ -->
-			<div class="select_list_panel">
-				<span style="margin-left:20px;">Повернуть объект </span>
-				<hr class="line">
-				<span title='в диапазоне от -180 до 180 градусов'>на</span>
-				<input id="object_gradus" class="input" type="number" value="0" min="-180" max="180" step="5" onChange="rotateCurrentObject();"> град    
 			</div>
-			
-			<div class="select_list_panel">
-				<span style="margin-left:20px;">Свойства жидкости</span>
-				<hr class="line">
-				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
-				<input id="water_density" class="input" type="number" value="1" min="0.1" max="15" step="0.1" onChange="updateWaterProperties();"> г/см<sup>3</sup>
-				<hr class="line">
-				<span title='в диапазоне от 0 до 10'>Вязкость</span>
-				<input id="water_drag" class="input" style="margin-left:40px;margin-right:7px;" type="number" value="1" min="0" max="10" step="0.2" 
-				onChange="updateWaterProperties();"> (коэф.)
-			</div>
-			
-			<div class="select_list_panel">
-				<span style="margin-left:20px;">Свойства соединения</span>
-				<hr class="line">
-				<span>Вид соединения</span>
-				<select id="add_joint_select">  
-					<option value="joint_distance"selected>Distance</option>
-					<option value="joint_revolute">Revolute</option>
-					<option value="joint_prismatic">Prismatic</option>
-					<option value="joint_pulley">Pulley</option>
-					<option value="joint_gear">Gear</option>
-				</select>
-				<hr class="line">
-				<span title='в диапазоне от 1 до 15'>Длина</span>
-				<input id="joint_length" class="input" type="number" value="5" min="1" max="15" step="1">
-				<hr class="line">
-                <span>Привязка к центру</span>
-                <input id="object_center" class="input" type="checkbox" checked>
-			</div>
-			
-			<input id="pause_simulation_button" type="button" value="Start/stop">
-			<input id="restart_button" type="button" value="Очистить поле">
-		
-		</div>	
-		
-	</body>   
+            <div id="pause_simulation_button" class="toggle_button">Пауза</div>
+		</div>
+	</body>
 </html>

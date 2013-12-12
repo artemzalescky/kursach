@@ -1,15 +1,9 @@
-// отображение идентификаторов объектов на объекты их строителей
-BUILDERS = {
-    'object_ball': BallBuilder(),
-    'object_box': BoxBuilder(),
-    'object_poly': PolyBuilder()
-}
-
 /* Базовый класс строителя объектов
  Наследники реализуют метод build, который должен создавать форму и базовую точка и вызывать _createObject.
  Также наследники хранят публичное поле creationController которое зависит от способа конструирования объекта */
 function ObjectBuilder() {
     var self = {};
+    self._objectView = null;
 
     // PROTECTED
     /* Создать объект
@@ -24,6 +18,8 @@ function ObjectBuilder() {
 
         var body = world.CreateBody(bodyDef);	// создаем тело
         body.CreateFixture(fixDef);				// прикрепляем к телу фигуру
+        var color = hexToRgb($('#object_color').val());
+        body.userData = self._objectView(body, color); // устанавливаем отрисовщик
         return body;
     }
 
@@ -39,8 +35,7 @@ function ObjectBuilder() {
 /* Класс строителя шаров */
 function BallBuilder() {
     var self = ObjectBuilder();
-
-    self.creationController = DragCreationController(self);
+    self._objectView = BallView;
 
     /* Создать и вернуть шар.
      points - массив из двух точек, центра и одной из точек окружности */
@@ -65,8 +60,7 @@ function BallBuilder() {
 /* Класс строителя прямоугольников */
 function BoxBuilder() {
     var self = ObjectBuilder();
-
-    self.creationController = DragCreationController(self);
+    self._objectView = PolygonView;
 
     /* Создать и вернуть прямоугольник.
      points - массив из двух точек которые образуют диагональ прямоугольника. */
@@ -95,8 +89,7 @@ function BoxBuilder() {
  Многоугольники должны быть выпуклыми и точки должны задаваться по часовой стрелке. */
 function PolyBuilder() {
     var self = ObjectBuilder();
-
-    self.creationController = ClickCreationController(self, 4);
+    self._objectView = PolygonView;
 
     /* Создать и вернуть многоугольник.
      points - массив точек многоугольника. */

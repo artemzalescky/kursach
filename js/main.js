@@ -8,7 +8,7 @@ function init() {		// вызывается  при загрузке страни
     setupPhysics();								// настраивает физику опыта
     setupDebugDraw();							// настраиваем debug draw (стандартный отрисовщик)
     window.setInterval(update, 1000 / FPS);		// интервал обновления
-   
+    				
     setupEventHandlers();
 }
 
@@ -20,28 +20,32 @@ function setupPhysics() {		// настраивает физику опыта
 }
 
 function setupEventHandlers() { // добавляем обработчики событий
-    canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
-    canvas.mouseup(mouseUp);
-    canvas.mousemove(mouseMove);
+    $(document).ready(function() {
+        canvas.mousedown(mouseDown);	// canvas.mousedown - событие, при клике по canvas;  mouseDown(event) - обработчик события
+        canvas.mouseup(mouseUp);
+        canvas.mousemove(mouseMove);
 
-    $('#pause_simulation_button').click(pauseButtonEvent);	
-	$('#restart_button').click(RestartButtonEvent);
-    $('body').keypress(keyPressed); // отлавливание событий нажатия клавиш
-    $('#select_list').change(inputDataChanged);
+        $('body').keydown(keyDown); // отлавливание событий нажатия клавиш
+        $('body').keyup(keyUp);
+        $("#sliding_toggles_block").find(".toggle_button").on("click", slidingToggleTriggered);    // нажимаем создать объект
+        $('#select_list').change(inputDataChanged);
+        $('#pause_simulation_button').click(pauseButtonTriggered);
+    });
 }
 
 function setWorldBounds() {		// установить границы мира
     ground = createWorldBound(0, CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT - WORLD_BOUND_THICKNESS);	// создаем землю
-    createWorldBound(0, 0, CANVAS_WIDTH, WORLD_BOUND_THICKNESS);						// потолок
-    createWorldBound(0, 0, WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);						// стены
-    createWorldBound(CANVAS_WIDTH, 0, CANVAS_WIDTH - WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);
+    var top = createWorldBound(0, 0, CANVAS_WIDTH, WORLD_BOUND_THICKNESS);						// потолок
+    var left = createWorldBound(0, 0, WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);						// стены
+    var right = createWorldBound(CANVAS_WIDTH, 0, CANVAS_WIDTH - WORLD_BOUND_THICKNESS, CANVAS_HEIGHT);
+    worldBounds = [ground, top, left, right];
 }
 
 function createWorldBound(x1, y1, x2, y2) {
     p1 = new b2Vec2(toMeters(x1), toMeters(y1));
     p2 = new b2Vec2(toMeters(x2), toMeters(y2));
     // получаем строитель прямоугольников и создаем границу по двум точкам
-    return BUILDERS['object_box'].build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
+    return BoxBuilder().build([p1, p2], WORLD_BOUND_FIX_DEF, WORLD_BOUND_BODY_DEF);
 }
 
 function updateGravitation() {	// обновить гравитацию
@@ -52,9 +56,9 @@ function updateGravitation() {	// обновить гравитацию
 function updateObjectProperties() {	// обновить свойства выделенного объекта
     if (selectedObject != null) {		// есть выделенное тело
         var f = selectedObject.GetFixtureList();
-        f.SetDensity(document.getElementById('created_object_density').value);
-        f.SetRestitution(document.getElementById('created_object_restitution').value);
-        f.SetFriction(document.getElementById('created_object_friction').value);
+        f.SetDensity(document.getElementById('object_density').value);
+        f.SetRestitution(document.getElementById('object_restitution').value);
+        f.SetFriction(document.getElementById('object_friction').value);
 
 		switch (document.getElementById('created_object_type').value){
             case "static_body":  selectedObject.SetType(b2Body.b2_staticBody); break;
@@ -109,8 +113,6 @@ function setupDebugDraw() {	// устанавливает настройки д�
     debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit | b2DebugDraw.e_pairBit);	// флаги рисования фигур и соединений
 
     world.SetDebugDraw(debugDraw);
-
-    painter = Painter();
 }
 
 function rotateCurrentObject() { //повернуть выделенный объект
@@ -128,7 +130,16 @@ function update() {	// обновляем мир
     );
 
     world.DrawDebugData();	// все рисуем
-    painter.drawAll();
+    painter.draw(); // отрисовываем контуры создаваемых фигур
+//    console.log(world.GetBodyCount() + ' count');
+
+    var body = world.GetBodyList();
+    while (body) {
+        if (body.userData) {
+            body.userData.draw();
+        }
+        body = body.GetNext();
+    }
 
     // обработка касания с водой
     for (var currentBody = world.GetBodyList(); currentBody; currentBody = currentBody.GetNext()) {	// идем по всем телам

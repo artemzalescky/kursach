@@ -1,13 +1,29 @@
+/* Базовый класс контроллера, ничего не реализует, просто декларирует методы */
+function BaseController () {
+    var self = {};
+
+    self.mouseDown = function (point) {};
+    self.mouseMove = function (point) {};
+    self.mouseUp = function (point) {};
+    self.keyPressed = function () {};
+    self.reset = function () {};
+    self.getPoints = function () {return []};
+
+    return self;
+}
+
+
 /* Базовый класс контроллера управляющий созданием объектов.
 
  Все контроллеры, которые от него наследуются реализуют методы mouseDown и mouseUp,
  благодаря чему можно легко реализовывать разные способы создания объектов.
 
  objectBuilder - объект, который будет вызываться для создания объектов (строитель объектов). */
-function ObjectCreationController(objectBuilder) {
-    var self = {};
+function ObjectCreationController (objectBuilder) {
+    var self = BaseController();
 
     // PROTECTED поля
+
     self._objectBuilder = objectBuilder;    // экземпляр строителя объектов
     self._objectConstructionPoints = [];    // сюда добавляются точки которые потом будут использоваться для создания объекта
 
@@ -21,25 +37,31 @@ function ObjectCreationController(objectBuilder) {
 
         var bodyDef = new b2BodyDef;
         bodyDef.type = BODY_TYPES[$('#object_body_type').val()];                // тип тела (static, dynamic, kinematic)
+        bodyDef.active = worldActivated;
 
         // вызываем строитель объектов
         self._objectBuilder.build(self._objectConstructionPoints, fixDef, bodyDef);
-        setObjectType('object_cursor');
+
+        self.reset();
+        objectCreated();
     }
 
     // PUBLIC поля
+
+    self.keyPressed = function () {
+        if (keyController.isActive(KEY_COMBINATIONS.BREAK)) {
+            self.reset();
+        }
+    }
+
     /* сбросить точки */
     self.reset = function () {
         self._objectConstructionPoints = [];
     }
 
-    // абстрактные методы
-    self.mouseDown = function (point) {
-        throw new Error()
-    };
-    self.mouseUp = function (point) {
-        throw new Error()
-    };
+    self.getPoints = function (point) {
+        return self._objectConstructionPoints;
+    }
 
     return self;
 }
@@ -51,35 +73,54 @@ function DragCreationController(objectBuilder) {
 
     self.mouseDown = function (point) {
         self._objectConstructionPoints.push(point);
+        self._objectConstructionPoints.push(point);
+    }
+
+    self.mouseMove = function (point) {
+        self._objectConstructionPoints[1] = point;
     }
 
     self.mouseUp = function (point) {
-        self._objectConstructionPoints.push(point);
-        if (self._objectConstructionPoints.length == 2) {
-            self._startObjectCreation();
-        }
-        self.reset();
+        self._startObjectCreation();
     }
 
     return self;
 }
 
-/* Класс контроллера создания объектов по любому числу точек.
- Для создания объекта нужно кликать мышкой, в конце нажать Enter. */
-function ClickCreationController(objectBuilder) {
+/* Класс контроллера создания объектов по любому числу точек. */
+function VariableClicksCreationController(objectBuilder, minPointsNumber) {
     var self = ObjectCreationController(objectBuilder);
 
-    self.mouseDown = function (point) {
+    if (minPointsNumber === undefined) {
+        minPointsNumber = 1;
     }
 
     self.mouseUp = function (point) {
         self._objectConstructionPoints.push(point);
     }
 
-    self.enterPressed = function () {
-        if (self._objectConstructionPoints) {
+    var superKeyPressed = self.keyPressed;
+    self.keyPressed = function () {
+        if (keyController.isActive(KEY_COMBINATIONS.FINISH) &&
+            self._objectConstructionPoints.length >= minPointsNumber)
+        {
             self._startObjectCreation();
-            self.reset();
+        } else {
+            superKeyPressed();
+        }
+    }
+
+    return self;
+}
+
+/* Класс контроллера создания объектов по фиксированному числу точек. */
+function FixedClicksCreationController(objectBuilder, pointsNumber) {
+    var self = ObjectCreationController(objectBuilder);
+
+    self.mouseUp = function (point) {
+        self._objectConstructionPoints.push(point);
+        if (self._objectConstructionPoints.length == pointsNumber) {
+            self._startObjectCreation();
         }
     }
 
@@ -87,123 +128,212 @@ function ClickCreationController(objectBuilder) {
 }
 
 // контроллер выделения фигур
-function SelectController() {
-    var self = {};
+function SelectionController () {
+    var self = BaseController();
 
-    var startPoint = new b2Vec2(0, 0); // начальная точка
-    var endPoint = new b2Vec2(0, 0); // конечная точка
+    var holding = false;        // зажата ли клавиша сохранения выделенных объектов
 
-    var selectedShapes = []; // список выделенных фигур
+    var selectionPoints = [];
     var selectedArea = new b2AABB(); // выделенная область
-    var activeShapes = []; // список активности фигур
+
+    self.selectedBodies = []; // список выделенных фигур
 
     // устанавливает стартовую точку (координаты x, y - в пикселях)
-    self.setStartPoint = function (x, y) {
-        startPoint.Set(toMeters(x), toMeters(y));
-        endPoint.Set(toMeters(x), toMeters(y));
+    self.mouseDown = function (point) {
+        selectionPoints = [point, point];
+        console.log('down ', selectionPoints.length);
     }
 
-    self.setEndPoint = function (x, y) {
-        endPoint.Set(toMeters(x), toMeters(y));
+    self.mouseMove = function (point) {
+        console.log('move ', selectionPoints.length);
+        selectionPoints[1] = point;
     }
 
-    // корректирует начальную и конечную точки. xMin, yMin - верхний левый угол. xMax, yMax - нижний правый
-    var correctPoints = function () {
-        var xMax = (startPoint.x >= endPoint.x) ? startPoint.x : endPoint.x;
-        var xMin = (startPoint.x < endPoint.x) ? startPoint.x : endPoint.x;
-        var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
-        var yMin = (startPoint.y < endPoint.y) ? startPoint.y : endPoint.y;
-        startPoint.Set(xMin, yMin);
-        endPoint.Set(xMax, yMax);
-    }
-
-    // активирует все фигуры для того, чтобы можно было выделить даже неактивные
-    // ATTENTION! обязателен вызов в паре с deactivateShapes
-    var activateShapes = function () {
-        var shapes = world.GetBodyList();
-        while (shapes) {
-            activeShapes.push(shapes.IsActive());
-            shapes.SetActive(true);
-            shapes = shapes.GetNext();
-        }
-    }
-
-    // возвращает все фигуры в исходное состояние
-    var deactivateShapes = function () {
-        var shapes = world.GetBodyList();
-        while (shapes) {
-            shapes.SetActive(activeShapes.shift());
-            shapes = shapes.GetNext();
-        }
-    }
-
-    // обновляет выделение
-    // @param clear - очистка списка выделенных фигур (true по умолчанию)
-    self.updateSelection = function (clear) {
-        if (clear === undefined) {
-            clear = true;
-        }
-        if (clear) {
-            selectedShapes = [];
+    self.mouseUp = function (point) {
+        console.log('up ', selectionPoints.length);
+        if (!keyController.isActive(KEY_COMBINATIONS.HOLD_SELECTION)) {
+            for (var i = 0; i < self.selectedBodies.length; ++i) {
+                self.selectedBodies[i].userData.setSelected(false);
+            }
+            self.selectedBodies = [];
         }
 
         correctPoints();
-        selectedArea.lowerBound.Set(startPoint.x, startPoint.y);
-        selectedArea.upperBound.Set(endPoint.x, endPoint.y);
+        selectedArea.lowerBound.Set(selectionPoints[0].x, selectionPoints[0].y);
+        selectedArea.upperBound.Set(selectionPoints[1].x, selectionPoints[1].y);
 
         function getBodyCallback(fixture) {
             var shapesAabb = fixture.GetAABB();
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
-                selectedShapes.push(fixture.GetBody());
+                var body = fixture.GetBody();
+                addBodyToSelected(body);
             }
             return true;
         }
 
-        activateShapes();
+        var activeBodies = activateAllBodies();
         world.QueryAABB(getBodyCallback, selectedArea);
-        deactivateShapes();
-
-        return selectedShapes;
+        deactivateAllBodies(activeBodies);
+        self.reset();
+        console.log('selected ', self.selectedBodies.length);
     }
 
-    self.getStartPoint = function () {
-        return startPoint;
+    var superKeyPressed = self.keyPressed;
+    self.keyPressed = function () {
+        if (keyController.isActive(KEY_COMBINATIONS.DELETE)) {
+            deleteObjects(self.selectedBodies);
+            self.reset();
+        } else if (keyController.isActive(KEY_COMBINATIONS.SELECT_ALL)) {
+            var body = world.GetBodyList();
+            while (body) {
+                addBodyToSelected(body);
+                body = body.GetNext();
+            }
+        } else {
+            superKeyPressed();
+        }
     }
 
-    self.getEndPoint = function () {
-        return endPoint;
+    self.reset = function () {
+        selectionPoints = [];
+    }
+
+    self.getPoints = function () {
+        return selectionPoints;
+    }
+
+    var addBodyToSelected = function (body) {
+        if (!itemInArray(body, self.selectedBodies) && !itemInArray(body, worldBounds)) {
+            self.selectedBodies.push(body);
+            body.userData.setSelected(true);
+        }
+    }
+
+    // корректирует начальную и конечную точки. xMin, yMin - верхний левый угол. xMax, yMax - нижний правый
+    var correctPoints = function () {
+        var startPoint = selectionPoints[0];
+        var endPoint = selectionPoints[1];
+        var xMax = (startPoint.x >= endPoint.x) ? startPoint.x : endPoint.x;
+        var xMin = (startPoint.x < endPoint.x) ? startPoint.x : endPoint.x;
+        var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
+        var yMin = (startPoint.y < endPoint.y) ? startPoint.y : endPoint.y;
+        selectionPoints = [new b2Vec2(xMin, yMin), new b2Vec2(xMax, yMax)];
     }
 
     return self;
 }
 
-function Painter() {
-    var self = {};
+function MoveObjectController () {
+    var self = BaseController();
 
-    var selectionArea = [];
-    for (var i = 0; i < 4; i++) {
-        selectionArea.push(new b2Vec2(0, 0));
-    }
-    var selectionColor = new b2Color(0, 0, 0.85);
+    var mouseJoint = null;
 
-    var active = false;
+    self.mouseDown = function (point) {
+        self.reset();
+        var selectedObject = getBodyAtPoint(point);		// получаем тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
 
-    self.drawAll = function () {
-        if (active) {
-            debugDraw.DrawPolygon(selectionArea, 4, selectionColor);
+        if (selectedObject) {	// если там было тело
+            var def = new b2MouseJointDef();	// создаем соединение между курсором и этим телом
+            def.bodyA = ground;
+            def.bodyB = selectedObject;
+            def.target = point;
+            def.collideConnected = true;
+            def.maxForce = 10000 * selectedObject.GetMass();
+            def.dampingRatio = 0;
+
+            mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
+
+            selectedObject.SetAwake(true);	// будим тело
         }
     }
 
-    self.setSelectionActive = function (a) {
-        active = a;
+    self.mouseMove = function (point) {
+        if (mouseJoint) {		// если есть соединение с курсором
+            mouseJoint.SetTarget(point);	 // уст. новую точку курсора
+        }
     }
 
-    self.setSelectionArea = function (p1, p2) {
-        selectionArea[0].x = selectionArea[3].x = p1.x;
-        selectionArea[0].y = selectionArea[1].y = p1.y;
-        selectionArea[1].x = selectionArea[2].x = p2.x;
-        selectionArea[2].y = selectionArea[3].y = p2.y;
+    self.mouseUp = function (point) {
+        self.reset();
     }
+
+    self.reset = function () {
+        if (mouseJoint) {	// если курсор был соединен с телом
+            world.DestroyJoint(mouseJoint);	// уничтожаем соединение
+            mouseJoint = null;
+        }
+    }
+
+    return self;
+}
+
+function SelectOrMoveController () {
+    var self = BaseController();
+
+    var selectionController = SelectionController();
+    var moveController = MoveObjectController();
+
+    var currentController = selectionController;
+
+    self.mouseDown = function (point) {
+        // если есть уже выделенные фигуры, то можем выделять selectController'ом
+        if (getBodyAtPoint(point) && !selectionController.selectedBodies.length) {
+            currentController = moveController;
+        } else {
+            currentController = selectionController;
+        }
+        currentController.mouseDown(point);
+    }
+
+    self.mouseMove = function (point) {
+        currentController.mouseMove(point);
+    }
+
+    self.mouseUp = function (point) {
+        currentController.mouseUp(point);
+    }
+
+    self.keyPressed = function () {
+        currentController.keyPressed();
+    }
+
+    self.reset = function () {
+        currentController.reset();
+    }
+
+    self.getPoints = function () {
+        return currentController.getPoints();
+    }
+
+    return self;
+}
+
+function JointCreationController (jointBuilder) {
+    var self = BaseController();
+
+    var bodies = [];
+    var points = [];
+
+    self._jointBuilder = jointBuilder;
+
+    self.mouseUp = function (point) {
+        var body = getBodyAtPoint(point, true);
+        if (body) {
+            bodies.push(body);
+            points.push(point);
+        }
+        if (bodies.length == self._jointBuilder.REQUIRED_BODIES_NUMBER) {
+            self._jointBuilder.createJoint(bodies, points);
+            self.reset();
+            jointCreated();
+        }
+    };
+
+    self.reset = function () {
+        bodies = [];
+        points = [];
+    };
+
     return self;
 }

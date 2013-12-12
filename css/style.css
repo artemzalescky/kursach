@@ -18,7 +18,7 @@ canvas{
 	background-color:#fff;
 }
 #select_list{
-	height:1100px;
+	height:700px;
 	width:250px;
 	background-color:#eee;
 	border:solid 1px #FF9900;
@@ -27,7 +27,7 @@ canvas{
 	padding:5px;
 }
 .select_list_panel{
-	margin:10px;
+	margin:10px 0;
 	background-color:#fff;
 	padding:5px;
 	border-radius:3px;
@@ -46,4 +46,20 @@ canvas{
 	margin-right:10px;
 	width:50px;
 	height:25px;
+}
+
+
+/* TOGGLE BUTTON*/
+.toggle_button {
+    display: inline-block;
+    margin: 2px 0;
+    padding: 3px 8px;
+    border: 1px solid #666;
+    border-radius: 4px;
+    background: #ddd;
+    cursor: pointer;
+}
+
+.toggle_button_enabled {
+    background: #bbb !important;
 }

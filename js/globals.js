@@ -1,8 +1,4 @@
-var b2Vec2 = Box2D.Common.Math.b2Vec2
-	, b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef
-	, b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef	
-	, b2PulleyJointDef = Box2D.Dynamics.Joints.b2PulleyJointDef	
-	, b2GearJointDef = Box2D.Dynamics.Joints.b2GearJointDef				// просто сокращения названий
+var b2Vec2 = Box2D.Common.Math.b2Vec2			// просто сокращения названий
     , b2AABB = Box2D.Collision.b2AABB
     , b2BodyDef = Box2D.Dynamics.b2BodyDef
     , b2Body = Box2D.Dynamics.b2Body
@@ -20,14 +16,14 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2
     , b2Settings = Box2D.Common.b2Settings
     , b2ContactFilter = Box2D.Dynamics.b2ContactFilter
     , b2BuoyancyController = Box2D.Dynamics.Controllers.b2BuoyancyController
-    , b2Color = Box2D.Common.b2Color;
+    , b2Color = Box2D.Common.b2Color
+    , b2Math = Box2D.Common.Math.b2Math;
 
 var FPS = 60; 	// отрисовка (кадров в секунду)
 var SCALE = 30;  // пикселей в метре
 
 var buoyancyController;	// контроллер плавучести
 var debugDraw;			// отрисовщик
-var painter;
 
 var canvas;		//объект canvas (форма в html)
 var CANVAS_WIDTH;	// размеры формы, где рисуем (canvas)
@@ -36,6 +32,7 @@ var CANVAS_HEIGHT;
 var world;	// объект мира
 var worldActivated = true; // запущен процесс симуляции
 var ground;	// тело земли
+var worldBounds;
 
 var BODY_TYPES = {
     'static_body': b2Body.b2_staticBody,
@@ -44,9 +41,40 @@ var BODY_TYPES = {
 }
 
 // константы для клавиш, берутся из event.which
-var KEY_CODE = {
-    ENTER: 13
+var KEYS = {
+    ENTER: 13,
+    SHIFT: 16,
+    CONTROL: 17,
+    ALT: 18,
+    ESC: 27,
+    DELETE: 46,
+    A: 65
+};
+
+var MODIFIERS = {
+    SHIFT: 1,
+    CONTROL: 2,
+    ALT: 4
+};
+
+var KEY_COMBINATIONS = {
+    SELECT_ALL: [MODIFIERS.CONTROL, KEYS.A],
+    HOLD_SELECTION: [MODIFIERS.CONTROL, null],
+    FINISH: [0, KEYS.ENTER],
+    DELETE: [0, KEYS.DELETE],
+    BREAK: [0, KEYS.ESC]
+};
+
+var keyController;
+
+var COLORS = {
+    SELECTED_SHAPE: new b2Color(0, 0, 0.7),
+    CONTOUR_SHAPE: new b2Color(0, 1, 0),
+    CONTOUR_POINT: new b2Color(0, 1, 0),
+    SELECTED_AREA: new b2Color(0, 0, 0.8)
 }
+
+CONTOUR_POINT_RADIUS = 0.05;
 
 // дефенишены для границ мира
 WORLD_BOUND_FIX_DEF = new b2FixtureDef;
