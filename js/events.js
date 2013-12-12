@@ -1,5 +1,6 @@
+var selectionController = SelectionController();
 CONTROLLERS = {
-    'cursor': SelectOrMoveController(),
+    'cursor': SelectOrMoveController(selectionController, MoveObjectController()),
     'object_ball': DragCreationController(BallBuilder()),
     'object_box': DragCreationController(BoxBuilder()),
     'object_poly': VariableClicksCreationController(PolyBuilder(), 3),
@@ -28,71 +29,151 @@ var mousePressed = false;	// нажата ли кнопка мыши
 function mouseDown(event) {		// обработчик нажатия мыши
     mousePressed = true;		// флажок, что кликнули
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
-    selectController.setStartPoint(event.offsetX, event.offsetY);
-
-    if (getActionType() == "action_joint" & getObjectType() == "object_cursor") { //если выбрали соединение
-       	addBodyForJoint(cursorPoint);
-        }
+    currentController.mouseDown(cursorPoint);
+}
 
 function mouseUp() {	// обработчик "отжатия" мыши
     mousePressed = false;	// флажок на "отжат"
-        var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
-        selectedObjectBuilder.creationController.mouseUp(cursorPoint);
-    }
+    var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
+    currentController.mouseUp(cursorPoint);
+}
 
 function mouseMove(event) {		// обработчик движения курсора
     if (mousePressed) {
-        selectController.setEndPoint(event.offsetX, event.offsetY);
-        if (!mouseJoint) {
-            painter.setSelectionActive(true);
-            painter.setSelectionArea(selectController.getStartPoint(), selectController.getEndPoint());
-        }
+        var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));
+        currentController.mouseMove(cursorPoint);
     }
+}
 
 // обработчик нажатия клавиш
-function keyPressed(event) {
-    if (event.which === KEY_CODE.ENTER) {
-        // не все контроллеры обрабатывают нажатие клавиши enter
-        if (selectedObjectBuilder.creationController.enterPressed) {
-            selectedObjectBuilder.creationController.enterPressed();
+function keyDown (event) {
+    keyController.keyDown(event);
+    currentController.keyPressed();
+}
+
+function keyUp (event) {
+    keyController.keyUp(event);
+}
+
+//определение свойств объекта
+function oneObjectSelected(selectedObject) {
+    if (selectedObject) {        // если там было тело
+
+                var shapeObject = document.getElementById('created_object_shape').value = selectedObject.GetFixtureList().GetShape().GetType();
+        switch (shapeObject) {
+            case 0:  document.getElementById('created_object_shape').value = "Снаряд"; break;
+            case 1:  document.getElementById('created_object_shape').value = "Ящик";   break;
+            default:
+                document.getElementById('created_object_shape').value = "нет данных"; break;
         }
 
-function getObjectType() {		// возвращает тип выбранного объекта из формы
-    return $('#add_object_select').val();
-}
-
-function getJointType(){		//возвращает тип выбранного соединения из формы
-	return $('#add_joint_select').val();
-}
-
-function getActionType() {		// возвращает действие выбранного объекта из формы
-    return $('#add_object_action').val();
-}
-
-function getBodyAtPoint(point, includeStatic) {		// тело фигуры, находящееся в той точке, куда кликнули (или null, если там пусто)
-    var aabb = new b2AABB();		// созд. область, где ищем тело
-    aabb.lowerBound.Set(point.x - 0.001, point.y - 0.001);
-    aabb.upperBound.Set(point.x + 0.001, point.y + 0.001);
-
-    var body = null;
-
-    function GetBodyCallback(fixture) {	// для перекрывающихся тел
-        var shape = fixture.GetShape();
-
-        if ((fixture.GetBody().GetType() != b2Body.b2_staticBody || includeStatic) && fixture.IsSensor() == false) { // сенсоры не выделяются (чтоб тело в воде можно было выделить)
-            var inside = shape.TestPoint(fixture.GetBody().GetTransform(), point);	// попали ли в тело
-
-            if (inside) {
-                body = fixture.GetBody();
-                return false;
-            }
+        var typeObject = selectedObject.GetType();
+        switch (typeObject){
+            case 0:  document.getElementById('created_object_type').value = "static_body"; break;
+            case 1:  document.getElementById('created_object_type').value = "kinematic_body";   break;
+            case 2:  document.getElementById('created_object_type').value = "dynamic_body"; break;
+            default:
+                document.getElementById('created_object_type').value = "нет данных"; break;
         }
 
-        return true;
+                if(shapeObject == 0){        // если круг
+                        var radiusObject = selectedObject.GetFixtureList().GetShape().GetRadius();
+                        document.getElementById('created_object_radius').value = Math.floor(radiusObject*10)/10;
+            document.getElementById('created_object_width').value = "";
+            document.getElementById('created_object_height').value = "";
+                }
+
+        if(shapeObject == 1){ // если прямоугольник
+            var v = selectedObject.GetFixtureList().GetShape().GetVertices();
+            document.getElementById('created_object_radius').value = "";
+            document.getElementById('created_object_width').value = Math.floor(Math.abs(v[0].x-v[1].x)*10)/10;
+            document.getElementById('created_object_height').value =  Math.floor(Math.abs(v[2].y-v[1].y)*10)/10;
+        }
+
+        // выводим в "Свойства объекта" св-ва выделенного объекта
+        document.getElementById('created_object_density').value = selectedObject.GetFixtureList().GetDensity();
+        document.getElementById('created_object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
+        document.getElementById('created_object_friction').value = selectedObject.GetFixtureList().GetFriction();
+        //для угла поворота
+        document.getElementById('object_gradus').value = toDegrees(selectedObject.GetAngle());
+
+        selectedObject.SetAwake(true);        // будим тело
+    }
+}
+
+function updateObjectProperties() {	// обновить свойства выделенного объекта
+
+    if (selectionController.selectedBodies.length == 1) {		// есть выделенное тело
+        var selectedObject = selectionController.selectedBodies[0];
+        var f = selectedObject.GetFixtureList();
+        f.SetDensity(document.getElementById('object_density').value);
+        f.SetRestitution(document.getElementById('object_restitution').value);
+        f.SetFriction(document.getElementById('object_friction').value);
+
+		switch (document.getElementById('created_object_type').value){
+            case "static_body":  selectedObject.SetType(b2Body.b2_staticBody); break;
+            case "kinematic_body":  selectedObject.SetType(b2Body.b2_kinematicBody); break;
+            case "dynamic_body":  selectedObject.SetType(b2Body.b2_dynamicBody); break;
+        }
+        selectedObject.SetAwake(true);		// будим выделенное тело (чтобы сразу узреть изменения)
+    }
+}
+
+function slidingToggleTriggered (event) {
+    var button = $(event.target);
+    var prevToggledButtonId = toggledButtonId;
+    closeAllSlidingToggles();
+
+    if (button.attr('id') != prevToggledButtonId) {
+        toggledButtonId = button.attr('id');
+
+        var panel = button.parent().find('.toggle_panel');
+        panel.slideDown("fast");
+        button.addClass('toggle_button_enabled');
+
+        switch (button.attr('id')) {
+            case 'create_object_button':
+                switchController(getObjectType());
+                break;
+            case 'create_joint_button':
+                switchController(getJointType());
+                break;
+            default:
+                switchController();
+        }
+    }
+}
+
+function closeAllSlidingToggles() {
+    var block = $('#sliding_toggles_block');
+    block.find('.toggle_panel').slideUp('fast');
+    block.find('.toggle_button').removeClass('toggle_button_enabled');
+    toggledButtonId = null;
+}
+
+function switchController(controllerType) {
+    if (controllerType in CONTROLLERS) {
+        currentController = CONTROLLERS[controllerType];
+        currentController.reset();
+    } else {
+        currentController = CONTROLLERS.cursor;
     }
 
-    world.QueryAABB(GetBodyCallback, aabb);
-    return body;
+    if (controllerType in PAINTERS) {
+        painter = PAINTERS[controllerType];
+    } else {
+        painter = PAINTERS.cursor;
+    }
+}
+
+function objectCreated() {  // вызывается сразу после создания объекта
+    closeAllSlidingToggles();
+    switchController();
+}
+
+function jointCreated() {  // вызывается сразу после создания объекта
+    closeAllSlidingToggles();
+    switchController();
 }
 
 // обработчик изменения полей данных
@@ -102,18 +183,14 @@ function inputDataChanged(event) {
         checkInputValueRange(event.target);
     }
 
+    updateObjectProperties();
+
     if (event.target.id === 'add_object_select') {
-        objectType = getObjectType();
-        switch (objectType) {
-            case 'object_ball':
-            case 'object_box':
-            case 'object_poly':
-                selectedObjectBuilder = BUILDERS[objectType];
-                break;
-            default:
-                selectedObjectBuiler = null;
-        }
+        switchController(getObjectType());
+    } else if (event.target.id === 'joint_select') {
+        switchController(getJointType());
     }
+}
 
 function checkInputValueRange(input_object) {
     // проверка на выход за предельные значения
@@ -124,8 +201,8 @@ function checkInputValueRange(input_object) {
     }
 }
 
-function pauseButtonEvent(event) {
-    worldActivated = !worldActivated;
+function pauseButtonTriggered(event) {
+    worldActivated = !toggleButton('pause_simulation_button');
     for (var shape = world.GetBodyList(); shape; shape = shape.GetNext()) {
         shape.SetActive(worldActivated);
     }

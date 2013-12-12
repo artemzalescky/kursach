@@ -50,118 +50,110 @@
                     <div id="create_object_panel" class="select_list_panel toggle_panel" style="display: none">
                     <span>Тип объекта</span>
                     <select id="add_object_select" onChange="resetSelectedObject()">
-					<option value="object_cursor" selected>Курсор</option>					
                         <option value="object_ball">Снаряд</option>
                         <option value="object_box">Ящик</option>
                         <option value="object_poly">Многоугольник</option>
                     </select>
-                </div>
-			</div>
 
-            <hr class="line">
-            <span>Цвет объекта</span>
-            <input type="color" id="object_color">
-
-			<div class="select_list_panel">
-				<span style="margin-left:20px;">Свойства нового объекта</span>
-
-                <hr class="line">
-                <span title='в диапазоне от 0,1 до 15'>Плотность</span>
-                <input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1" onChange="updateObjectProperties();"> г/см<sup>3</sup>
-
-                <hr class="line">
-                <span>Трение</span>
-                <input id="object_friction" class="input" type="number" value="0.5" min="0.1" max="1" step="0.1" onChange="updateObjectProperties();">
-
-                <hr class="line">
-                <span title='в диапазоне от 0 до 1'>Упругость</span>
-                <input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1" onChange="updateObjectProperties();"> (коэф.)
-
-                <hr class="line">
-                <span>Тип тела</span>
-                <select id="object_body_type">
-                    <option value="static_body" >Статическое</option>
-                    <option value="dynamic_body"selected >Динамическое</option>
-                    <option value="kinematic_body">Кинематическое</option>
-                </select>
-
-                <hr class="line">
-                <span>Твердое тело</span>
-                <input id="object_is_sensor" class="input" type="checkbox" checked>
-            </div>
-			<div class="select_list_panel">
-				<span style="margin-left:20px;">Повернуть объект </span>
-				<hr class="line">
-				<span title='в диапазоне от -180 до 180 градусов'>на</span>
-				<input id="object_gradus" class="input" type="number" value="0" min="-180" max="180" step="5" onChange="rotateCurrentObject();"> град    
-            </div>
-
-            <div>
-                <div id="create_joint_button" class="toggle_button">Создать соединение</div><br>
-                <div  id="create_joint_panel" class="select_list_panel toggle_panel" style="display: none">
-                    <span>Тип соединения</span>
-                    <select id="joint_select">
-                        <option value="distance_joint">Distance</option>
-                        <option value="revolute_joint">Revolute</option>
-                        <option value="prismatic_joint">Prismatic</option>
-                        <option value="gear_joint">Gear</option>
-                        <option value="pulley_joint">Pulley</option>
-                    </select>
                     <hr class="line">
-                    <span title='в диапазоне от 1 до 15'>Длина</span>
-                    <input id="joint_length" class="input" type="number" value="5" min="1" max="15" step="1">
+                    <span>Цвет объекта</span>
+                    <input type="color" id="object_color">
+
+                    <hr class="line">
+                    <span title='в диапазоне от 0,1 до 15'>Плотность</span>
+                    <input id="object_density" class="input" type="number" value="0.5" min="0.1" max="15" step="0.1" onChange="updateObjectProperties();"> г/см<sup>3</sup>
+
+                    <hr class="line">
+                    <span>Трение</span>
+                    <input id="object_friction" class="input" type="number" value="0.5" min="0.1" max="1" step="0.1" onChange="updateObjectProperties();">
+
+                    <hr class="line">
+                    <span title='в диапазоне от 0 до 1'>Упругость</span>
+                    <input id="object_restitution" class="input" type="number" value="0.3" min="0" max="1" step="0.1" onChange="updateObjectProperties();"> (коэф.)
+
+                    <hr class="line">
+                    <span>Тип тела</span>
+                    <select id="object_body_type">
+                        <option value="static_body" >Статическое</option>
+                        <option value="dynamic_body"selected >Динамическое</option>
+                        <option value="kinematic_body">Кинематическое</option>
+                    </select>
+
+                    <hr class="line">
+                    <span>Твердое тело</span>
+                    <input id="object_is_sensor" class="input" type="checkbox" checked>
+                </div>
+                </div>
+
+                <div>
+                    <div id="create_joint_button" class="toggle_button">Создать соединение</div><br>
+                    <div  id="create_joint_panel" class="select_list_panel toggle_panel" style="display: none">
+                        <span>Тип соединения</span>
+                        <select id="joint_select">
+                            <option value="distance_joint">Distance</option>
+                            <option value="revolute_joint">Revolute</option>
+                            <option value="prismatic_joint">Prismatic</option>
+                            <option value="gear_joint">Gear</option>
+                            <option value="pulley_joint">Pulley</option>
+                        </select>
+
+                    </div>
                 </div>
             </div>
+
             <div class="select_list_panel">
-				<span style="margin-left:1px;">Свойства созданного объекта</span>
-              
+                <span style="margin-left:1px;">Свойства созданного объекта</span>
+
                 <hr class="line">
                 <span>Форма</span>
                 <input id="created_object_shape" type="text" style="max-width:130px;">
 
-				<hr class="line">
-				<span>Тип</span>
-				<select id="created_object_type" onChange="updateObjectProperties();">
-					<option value="empty_body" selected></option>
+                <hr class="line">
+                <span>Тип</span>
+                <select id="created_object_type" onChange="updateObjectProperties();">
+                    <option value="empty_body" selected></option>
                     <option value="static_body">Статическое</option>
                     <option value="dynamic_body">Динамическое</option>
                     <option value="kinematic_body">Кинематическое</option>
                 </select>
-				<!--
-				<hr class="line">
-                <span>Твердое тело</span>                
-                <select id="created_object_is_sensor" onChange="updateObjectProperties();" >
-                    <option value="body_empty_sensor" selected></option>
-                    <option value="body_is_sensor" >Твёрдое</option>
-                    <option value="body_is_no_sensor" >не твёрдое</option>                
-                </select>
-                -->
-				<hr class="line">
-				<span>Радиус</span>
-				<input id="created_object_radius" class="input" type="number" min="0.1" max="40" step="0.1" onChange="updateObjectProperties();" style="width:100px;"> м
 
-				<hr class="line">
-				<span>Ширина</span>
-				<input id="created_object_width" class="input" type="number" min="0.1" max="40" step="0.1" onChange="updateObjectProperties();" style="width:100px;"> м
-				
-				<hr class="line">
-				<span>Высота</span>
-				<input id="created_object_height" class="input" type="number" min="0.1" max="40" step="0.1" onChange="updateObjectProperties();" style="width:100px;"> м
-				
-				<hr class="line">
-				<span title='в диапазоне от 0,1 до 15'>Плотность</span>
-				<input id="created_object_density" class="input" type="number" min="0.1" max="15" step="0.1" onChange="updateObjectProperties();"> г/см<sup>3</sup>
+                <hr class="line">
+                <span title='в диапазоне от -180 до 180 градусов'>Угол поворота</span>
+                <input id="object_gradus" class="input" type="number" value="0" min="-180" max="180" step="5" onChange="rotateCurrentObject();"> град
+
+                <hr class="line">
+                <span>Радиус</span>
+                <input id="created_object_radius" class="input" type="number" min="0.1" max="40" step="0.1"
+                       onChange="updateObjectProperties();" style="width:100px;"> м
+
+                <hr class="line">
+                <span>Ширина</span>
+                <input id="created_object_width" class="input" type="number" min="0.1" max="40" step="0.1"
+                       onChange="updateObjectProperties();" style="width:100px;"> м
+
+                <hr class="line">
+                <span>Высота</span>
+                <input id="created_object_height" class="input" type="number" min="0.1" max="40" step="0.1"
+                       onChange="updateObjectProperties();" style="width:100px;"> м
+
+                <hr class="line">
+                <span title='в диапазоне от 0,1 до 15'>Плотность</span>
+                <input id="created_object_density" class="input" type="number" min="0.1" max="15" step="0.1"
+                       onChange="updateObjectProperties();"> г/см<sup>3</sup>
 
                 <hr class="line">
                 <span>Трение</span>
-                <input id="created_object_friction" class="input" type="number" min="0.1" max="1" step="0.1" onChange="updateObjectProperties();">
+                <input id="created_object_friction" class="input" type="number" min="0.1" max="1" step="0.1"
+                       onChange="updateObjectProperties();">
 
-				<hr class="line">
-				<span title='в диапазоне от 0 до 1'>Упругость</span>
-				<input id="created_object_restitution" class="input" type="number" min="0" max="1" step="0.1" onChange="updateObjectProperties();"> (коэф.) 
-				
-			</div>
+                <hr class="line">
+                <span title='в диапазоне от 0 до 1'>Упругость</span>
+                <input id="created_object_restitution" class="input" type="number" min="0" max="1" step="0.1"
+                       onChange="updateObjectProperties();"> (коэф.)
+
+            </div>
+
             <div id="pause_simulation_button" class="toggle_button">Пауза</div>
 		</div>
-	</body>
+	</body>   
 </html>

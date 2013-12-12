@@ -19,7 +19,7 @@ function KeysController () {
             (event.altKey * MODIFIERS.ALT);
     }
 
-    self.keyPressed = function (event) {
+    self.keyDown = function (event) {
         modifiers = getModifiers(event);
         if (!(itemInArray(event.which, modifierCodes))) {
             key = event.which;

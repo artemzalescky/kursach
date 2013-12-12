@@ -152,10 +152,7 @@ function SelectionController () {
     self.mouseUp = function (point) {
         console.log('up ', selectionPoints.length);
         if (!keyController.isActive(KEY_COMBINATIONS.HOLD_SELECTION)) {
-            for (var i = 0; i < self.selectedBodies.length; ++i) {
-                self.selectedBodies[i].userData.setSelected(false);
-            }
-            self.selectedBodies = [];
+            self.clearSelection();
         }
 
         correctPoints();
@@ -167,7 +164,7 @@ function SelectionController () {
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
                 var body = fixture.GetBody();
-                addBodyToSelected(body);
+                self.addBodyToSelected(body);
             }
             return true;
         }
@@ -177,6 +174,10 @@ function SelectionController () {
         deactivateAllBodies(activeBodies);
         self.reset();
         console.log('selected ', self.selectedBodies.length);
+
+        if (self.selectedBodies.length === 1) {
+            oneObjectSelected(self.selectedBodies[0]);
+        }
     }
 
     var superKeyPressed = self.keyPressed;
@@ -187,7 +188,7 @@ function SelectionController () {
         } else if (keyController.isActive(KEY_COMBINATIONS.SELECT_ALL)) {
             var body = world.GetBodyList();
             while (body) {
-                addBodyToSelected(body);
+                self.addBodyToSelected(body);
                 body = body.GetNext();
             }
         } else {
@@ -199,11 +200,18 @@ function SelectionController () {
         selectionPoints = [];
     }
 
+    self.clearSelection = function () {
+        for (var i = 0; i < self.selectedBodies.length; ++i) {
+            self.selectedBodies[i].userData.setSelected(false);
+        }
+        self.selectedBodies = [];
+    }
+
     self.getPoints = function () {
         return selectionPoints;
     }
 
-    var addBodyToSelected = function (body) {
+    self.addBodyToSelected = function (body) {
         if (!itemInArray(body, self.selectedBodies) && !itemInArray(body, worldBounds)) {
             self.selectedBodies.push(body);
             body.userData.setSelected(true);
@@ -268,18 +276,21 @@ function MoveObjectController () {
     return self;
 }
 
-function SelectOrMoveController () {
+function SelectOrMoveController (selectionController, moveController) {
     var self = BaseController();
 
-    var selectionController = SelectionController();
-    var moveController = MoveObjectController();
+    var selectionController = selectionController;
+    var moveController = moveController;
 
     var currentController = selectionController;
 
     self.mouseDown = function (point) {
         // если есть уже выделенные фигуры, то можем выделять selectController'ом
-        if (getBodyAtPoint(point) && !selectionController.selectedBodies.length) {
+        var clickedBody = getBodyAtPoint(point);
+        if (clickedBody) {
             currentController = moveController;
+            selectionController.clearSelection();
+            selectionController.addBodyToSelected(clickedBody);
         } else {
             currentController = selectionController;
         }
