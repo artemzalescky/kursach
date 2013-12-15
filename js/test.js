@@ -1,9 +1,32 @@
-﻿test('getObjectType()', function () {
+﻿
+
+
+test('getObjectType()', function () {
   ok(getObjectType() === 'object_box', 'Проверка функции просмотра выбранного объекта');
 });
 
-test('getActionType()', function () {
-  ok(getActionType() === 'action_drag', 'Проверка функции просмотра действия курсора');
+test('checkInputValueRange()', function () {
+
+  // создаём объект для тестирования
+  var obj = new Object();
+  obj.value = -10;
+  obj.min = 1;
+  obj.max = 20;
+
+  // Выполняем функцию для тестирования
+  checkInputValueRange(obj);
+
+  ok(obj.value === 1, 'Проверка функции максимального и минимального значения(если значение меньше минимального)');
+
+  obj.value = 5;
+  checkInputValueRange(obj);
+  ok(obj.value === 5, 'Проверка функции максимального и минимального значения(если значение входит в допустимые значения)');
+
+  obj.value = 50;
+  checkInputValueRange(obj);
+  ok(obj.value === 20, 'Проверка функции максимального и минимального значения(если значение больше максимального)');
+
+
 });
 
 test('getBodyAtPoint()', function () {

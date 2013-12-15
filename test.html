@@ -7,13 +7,17 @@
 
 	<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
 	<script type="text/javascript" src="lib/jquery-2.0.3.js"></script>
-	  <script type="text/javascript" src="lib/qunit.js"></script>	
-        <script type="text/javascript" src="js/globals.js"></script>
-        <script type="text/javascript" src="js/tools.js"></script>
-        <script type="text/javascript" src="js/controllers.js"></script>
-	<script type="text/javascript" src="js/objects.js"></script>
-	<script type="text/javascript" src="js/events.js"></script>
-	<script type="text/javascript" src="js/main.js"></script>
+	  <script type="text/javascript" src="lib/qunit.js"></script>
+     <!-- сам javascript-код -->
+     <script type="text/javascript" src="js/globals.js"></script>
+     <script type="text/javascript" src="js/tools.js"></script>
+     <script type="text/javascript" src="js/keys.js"></script>
+     <script type="text/javascript" src="js/controllers.js"></script>
+     <script type="text/javascript" src="js/painters.js"></script>
+     <script type="text/javascript" src="js/joints.js"></script>
+     <script type="text/javascript" src="js/objects.js"></script>
+     <script type="text/javascript" src="js/events.js"></script>
+     <script type="text/javascript" src="js/main.js"></script>
         
         <script type="text/javascript" src="js/test.js"></script>
  </head>
@@ -27,7 +31,8 @@
   <canvas id="canvas" width="950" height="600"></canvas>
   
   <input type="hidden" id="add_object_select" value="object_box">
-  <input type="hidden" id="add_object_action" value="action_drag">
-  <input type="hidden" id="input_max_range" value="0.345533232">
+
+  <input type="color" id="object_color" type="hidden">
+
  </body>
 </html>
