@@ -159,7 +159,7 @@ function SelectionController () {
         selectedArea.lowerBound.Set(selectionPoints[0].x, selectionPoints[0].y);
         selectedArea.upperBound.Set(selectionPoints[1].x, selectionPoints[1].y);
 
-        function getBodyCallback(fixture) {
+        function getBodyCallback(fixture) {  //возвращает список всех выделенных объектов
             var shapesAabb = fixture.GetAABB();
             var inside = shapesAabb.TestOverlap(selectedArea);
             if (inside) {
