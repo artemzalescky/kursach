@@ -175,8 +175,11 @@ function SelectionController () {
         self.reset();
         console.log('selected ', self.selectedBodies.length);
 
-        if (self.selectedBodies.length === 1) {
-            oneObjectSelected(self.selectedBodies[0]);
+         if (self.selectedBodies.length === 1) {            
+            propertiesObject(self.selectedBodies[0]);
+        }
+        else {            
+            propertiesObject(null);
         }
     }
 
@@ -253,6 +256,8 @@ function MoveObjectController () {
             mouseJoint = world.CreateJoint(def);	// доб. соединение к миру
 
             selectedObject.SetAwake(true);	// будим тело
+
+	    propertiesObject(selectedObject);
         }
     }
 

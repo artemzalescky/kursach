@@ -96,8 +96,9 @@ function setupDebugDraw() {	// устанавливает настройки д�
 }
 
 function rotateCurrentObject() { //повернуть выделенный объект
+    var selectedObject = selectionController.selectedBodies[0];
     if (selectedObject != null) {  // есть выделенное тело
-        selectedObject.SetAngle(toRadian(document.getElementById('object_gradus').value));
+        selectedObject.SetAngle(toRadian(document.getElementById('properties_object_gradus').value));
         wakeAllBodies();
     }
 }

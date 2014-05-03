@@ -55,65 +55,85 @@ function keyUp (event) {
     keyController.keyUp(event);
 }
 
-//определение свойств объекта
-function oneObjectSelected(selectedObject) {
+function propertiesObject(selectedObject) {
+
     if (selectedObject) {        // если там было тело
 
-                var shapeObject = document.getElementById('created_object_shape').value = selectedObject.GetFixtureList().GetShape().GetType();
+
+        var shapeObject = selectedObject.GetFixtureList().GetShape().GetType();
         switch (shapeObject) {
-            case 0:  document.getElementById('created_object_shape').value = "Снаряд"; break;
-            case 1:  document.getElementById('created_object_shape').value = "Ящик";   break;
+            case 0:  document.getElementById('properties_object_shape').value = "Снаряд"; break;
+            case 1:  document.getElementById('properties_object_shape').value = "Ящик";   break;
             default:
-                document.getElementById('created_object_shape').value = "нет данных"; break;
+                document.getElementById('properties_object_shape').value = "нет данных"; break;
         }
 
         var typeObject = selectedObject.GetType();
         switch (typeObject){
-            case 0:  document.getElementById('created_object_type').value = "static_body"; break;
-            case 1:  document.getElementById('created_object_type').value = "kinematic_body";   break;
-            case 2:  document.getElementById('created_object_type').value = "dynamic_body"; break;
+            case 0:  document.getElementById('properties_object_type')[1].selected = true; break;
+            case 2:  document.getElementById('properties_object_type')[2].selected = true;   break;
+            case 1:  document.getElementById('properties_object_type')[3].selected = true; break;
             default:
-                document.getElementById('created_object_type').value = "нет данных"; break;
+                document.getElementById('properties_object_type')[0].selected = true; break;
         }
 
-                if(shapeObject == 0){        // если круг
-                        var radiusObject = selectedObject.GetFixtureList().GetShape().GetRadius();
-                        document.getElementById('created_object_radius').value = Math.floor(radiusObject*10)/10;
-            document.getElementById('created_object_width').value = "";
-            document.getElementById('created_object_height').value = "";
-                }
+         if(shapeObject == 0){        // если круг
+          var radiusObject = selectedObject.GetFixtureList().GetShape().GetRadius();
+          document.getElementById('box_properties').style.display = "none";
+          document.getElementById('ball_properties').style.display = "block";
+          document.getElementById('properties_object_radius').value = Math.floor(radiusObject*10)/10;                  
+        }
 
         if(shapeObject == 1){ // если прямоугольник
-            var v = selectedObject.GetFixtureList().GetShape().GetVertices();
-            document.getElementById('created_object_radius').value = "";
-            document.getElementById('created_object_width').value = Math.floor(Math.abs(v[0].x-v[1].x)*10)/10;
-            document.getElementById('created_object_height').value =  Math.floor(Math.abs(v[2].y-v[1].y)*10)/10;
+          var v = selectedObject.GetFixtureList().GetShape().GetVertices();
+          document.getElementById('ball_properties').style.display = "none";
+          document.getElementById('box_properties').style.display = "block";
+          document.getElementById('properties_object_width').value = Math.floor(Math.abs(v[0].x-v[1].x)*10)/10;
+          document.getElementById('properties_object_height').value =  Math.floor(Math.abs(v[2].y-v[1].y)*10)/10;
         }
 
         // выводим в "Свойства объекта" св-ва выделенного объекта
-        document.getElementById('created_object_density').value = selectedObject.GetFixtureList().GetDensity();
-        document.getElementById('created_object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
-        document.getElementById('created_object_friction').value = selectedObject.GetFixtureList().GetFriction();
+        document.getElementById('properties_object_density').value = selectedObject.GetFixtureList().GetDensity();
+        document.getElementById('properties_object_restitution').value = selectedObject.GetFixtureList().GetRestitution();
+        document.getElementById('properties_object_friction').value = selectedObject.GetFixtureList().GetFriction();
         //для угла поворота
-        document.getElementById('object_gradus').value = toDegrees(selectedObject.GetAngle());
+        document.getElementById('properties_object_gradus').value = toDegrees(selectedObject.GetAngle());
 
         selectedObject.SetAwake(true);        // будим тело
+    }
+	else{  //не выделено тело
+
+       	document.getElementById('properties_object_shape').value = "";
+
+       	document.getElementById('properties_object_type')[0].selected = true;
+
+      	document.getElementById('properties_object_radius').value = "";
+      	document.getElementById('properties_object_width').value = "";
+       	document.getElementById('properties_object_height').value = "";
+
+        // выводим в "Свойства объекта" св-ва выделенного объекта
+        document.getElementById('properties_object_density').value = "";
+        document.getElementById('properties_object_restitution').value = "";
+        document.getElementById('properties_object_friction').value = "";
+        //для угла поворота
+        document.getElementById('properties_object_gradus').value = "";
+
     }
 }
 
 function updateObjectProperties() {	// обновить свойства выделенного объекта
-
+    
     if (selectionController.selectedBodies.length == 1) {		// есть выделенное тело
         var selectedObject = selectionController.selectedBodies[0];
         var f = selectedObject.GetFixtureList();
-        f.SetDensity(document.getElementById('object_density').value);
-        f.SetRestitution(document.getElementById('object_restitution').value);
-        f.SetFriction(document.getElementById('object_friction').value);
+        f.SetDensity(document.getElementById('properties_object_density').value);
+        f.SetRestitution(document.getElementById('properties_object_restitution').value);
+        f.SetFriction(document.getElementById('properties_object_friction').value);
 
-		switch (document.getElementById('created_object_type').value){
-            case "static_body":  selectedObject.SetType(b2Body.b2_staticBody); break;
-            case "kinematic_body":  selectedObject.SetType(b2Body.b2_kinematicBody); break;
-            case "dynamic_body":  selectedObject.SetType(b2Body.b2_dynamicBody); break;
+		switch (document.getElementById('properties_object_type').options.selectedIndex) {
+            case 1:  selectedObject.SetType(b2Body.b2_staticBody); break;
+            case 2:  selectedObject.SetType(b2Body.b2_dynamicBody); break;
+            case 3:  selectedObject.SetType(b2Body.b2_kinematicBody); break;
         }
         selectedObject.SetAwake(true);		// будим выделенное тело (чтобы сразу узреть изменения)
     }
