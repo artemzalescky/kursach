@@ -187,6 +187,7 @@ function switchController(controllerType) {
 }
 
 function objectCreated() {  // вызывается сразу после создания объекта
+    painter.reset();
     closeAllSlidingToggles();
     switchController();
 }
