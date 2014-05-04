@@ -5,8 +5,8 @@ function init() {		// вызывается  при загрузке страни
     CANVAS_WIDTH = parseInt(canvas.attr('width'));		// делаем расстояния границ мира по размерам canvas
     CANVAS_HEIGHT = parseInt(canvas.attr('height'));
 
+    setupDrawing();
     setupPhysics();								// настраивает физику опыта
-    setupDebugDraw();							// настраиваем debug draw (стандартный отрисовщик)
     window.setInterval(update, 1000 / FPS);		// интервал обновления
     				
     setupEventHandlers();
@@ -84,15 +84,8 @@ function wakeAllBodies() {	// разбудить все тела (для изм�
     }
 }
 
-function setupDebugDraw() {	// устанавливает настройки для отрисовки
-    debugDraw = new b2DebugDraw();
-    debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
-    debugDraw.SetDrawScale(SCALE);
-    debugDraw.SetFillAlpha(0.5);		// коэффициент непрозрачности
-    debugDraw.SetLineThickness(1);
-    debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit | b2DebugDraw.e_pairBit);	// флаги рисования фигур и соединений
-
-    world.SetDebugDraw(debugDraw);
+function setupDrawing() {
+    svg = d3.select('svg#canvas');
 }
 
 function rotateCurrentObject() { //повернуть выделенный объект

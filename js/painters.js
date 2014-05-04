@@ -1,26 +1,49 @@
+// генерируем функцию, которая преобразует набор точек в строку комманд для path в svg
+var pointsToSvgLine = d3.svg.line()
+        .x(function(point) {return point.x * SCALE;})
+        .y(function(point) {return point.y * SCALE;})
+        .interpolate("linear");
+
+
 function Painter() {
     var self = {};
 
-    var axis = new b2Vec2(0, 0);        // нужно для отрисовки точек контура
-    self.contour_points_enabled = false;
+    self.contourPointsEnabled = false;
+    var contourPointsSvg = [];
 
     self.draw = function() {
         var points = currentController.getPoints();
         if (points.length) {
             self._draw(points);
-            if (self.contour_points_enabled) {
-                draw_contour_points(points);
+            if (self.contourPointsEnabled) {
+                drawContourPoints(points);
             }
         }
-    }
+    };
+
+    self.reset = function() {
+        for (i = 0; i < contourPointsSvg.length; i++) {
+            contourPointsSvg[i].remove();
+        }
+        contourPointsSvg = [];
+    };
 
     self._draw = function(points) { throw new Error; }
 
-    var draw_contour_points = function (points) {
-        for (i = 0; i < points.length; i++) {
-            debugDraw.DrawSolidCircle(points[i], CONTOUR_POINT_RADIUS, axis, COLORS.CONTOUR_POINT);
+    var drawContourPoints = function (points) {
+
+        for (i = contourPointsSvg.length; i < points.length; i++) {
+            var point_svg = svg.append('circle').attr('r', CONTOUR_POINT_RADIUS);
+            contourPointsSvg.push(point_svg);
         }
-    }
+
+        for (i = 0; i < points.length; i++) {
+            contourPointsSvg[i]
+                .attr('cx', points[i].x * SCALE)
+                .attr('cy', points[i].y * SCALE)
+                .attr('fill', COLORS.CONTOUR_POINT);
+        }
+    };
 
     return self;
 }
@@ -28,51 +51,100 @@ function Painter() {
 function SelectionPainter() {
     var self = Painter();
 
-    var selectionArea = [];
-    for (var i = 0; i < 4; i++) {
-        selectionArea.push(new b2Vec2(0, 0));
-    }
+    selectionSvg = null;
 
     self._draw = function(points) {
         if (points.length) {
-            selectionArea[0].x = selectionArea[3].x = points[0].x;
-            selectionArea[0].y = selectionArea[1].y = points[0].y;
-            selectionArea[1].x = selectionArea[2].x = points[1].x;
-            selectionArea[2].y = selectionArea[3].y = points[1].y;
-            debugDraw.DrawPolygon(selectionArea, 4, COLORS.SELECTED_AREA);
+            if (!selectionSvg) {
+                selectionSvg = svg.append('rect')
+                    .attr('stroke', COLORS.SELECTED_STROKE)
+                    .attr('fill', COLORS.SELECTED_AREA)
+            }
+
+            points = correctedPoints(points);
+            selectionSvg
+                .attr('x', points[0].x * SCALE)
+                .attr('y', points[0].y * SCALE)
+                .attr('width', (points[1].x - points[0].x) * SCALE)
+                .attr('height', (points[1].y - points[0].y) * SCALE)
         }
+    }
+
+    self.reset = function() {
+        selectionSvg.remove();
+        selectionSvg = null;
     }
 
     return self;
 }
 
-function ObjectPainter() {
+function ContourPainter() {
     var self = Painter();
 
-    self.contour_points_enabled = true;
+    self._contourSvg = null;
+
+    self.contourPointsEnabled = true;
+
+    var super_draw = self.draw
+    self.draw = function() {
+        if (!self._contourSvg) {
+            self._initContourSvg();
+        }
+        super_draw();
+    }
+
+    self._initContourSvg = function() {
+        throw new Error; // Not implemented
+    }
+
+    var super_reset = self.reset
+    self.reset = function() {
+        super_reset();
+        self._contourSvg.remove();
+        self._contourSvg = null;
+    }
 
     return self;
 }
 
 function BallContourPainter() {
-    var self = ObjectPainter();
+    var self = ContourPainter();
+
+    self._initContourSvg = function() {
+        self._contourSvg = svg.append('circle')
+            .attr('fill', 'none')
+            .attr('stroke-width', 2)
+            .attr('stroke', COLORS.CONTOUR_SHAPE);
+    }
 
     self._draw = function(points) {
         var dx = points[0].x - points[1].x;
         var dy = points[0].y - points[1].y;
         var radius = Math.sqrt(dx * dx + dy * dy);
-        debugDraw.DrawCircle(points[0], radius, COLORS.CONTOUR_SHAPE);
+
+        self._contourSvg
+            .attr('r', radius * SCALE)
+            .attr('cx', points[0].x * SCALE)
+            .attr('cy', points[0].y * SCALE)
     }
 
     return self;
 }
 
 function PolygonContourPainter() {
-    var self = ObjectPainter();
+    var self = ContourPainter();
+
+    self._initContourSvg = function() {
+        self._contourSvg = svg.append('path')
+            .attr('fill', 'none')
+            .attr('stroke-width', 2)
+            .attr('stroke', COLORS.CONTOUR_SHAPE);
+    }
 
     self._draw = function(points) {
         if (points.length >= 2) {
-            debugDraw.DrawPolygon(points, points.length, COLORS.CONTOUR_SHAPE);
+            self._contourSvg
+                .attr('d', pointsToSvgLine(points));
         }
     }
 
@@ -80,19 +152,22 @@ function PolygonContourPainter() {
 }
 
 function BoxContourPainter() {
-    var self = ObjectPainter();
+    var self = ContourPainter();
 
-    var contour = [];
-    for (var i = 0; i < 4; i++) {
-        contour.push(new b2Vec2(0, 0));
+    self._initContourSvg = function() {
+        self._contourSvg = svg.append('rect')
+            .attr('fill', 'none')
+            .attr('stroke-width', 2)
+            .attr('stroke', COLORS.CONTOUR_SHAPE);
     }
 
     self._draw = function(points) {
-        contour[0].x = contour[3].x = points[0].x;
-        contour[0].y = contour[1].y = points[0].y;
-        contour[1].x = contour[2].x = points[1].x;
-        contour[2].y = contour[3].y = points[1].y;
-        debugDraw.DrawPolygon(contour, 4, COLORS.CONTOUR_SHAPE);
+        points = correctedPoints(points);
+        self._contourSvg
+            .attr('x', points[0].x * SCALE)
+            .attr('y', points[0].y * SCALE)
+            .attr('width', (points[1].x - points[0].x) * SCALE)
+            .attr('height', (points[1].y - points[0].y) * SCALE)
     }
 
     return self;
@@ -104,14 +179,16 @@ function ShapeView(body, color) {
     self._body = body;
     self._isSelected = false;
 
-//    self._color = new b2Color(Math.random(), Math.random(), Math.random());
     self._color = color;
-//    self._color = new b2Color(0, 0, 0);
 
     self.draw = function() { throw new Error; }
 
     self.setSelected = function(selected) {
         self._isSelected = selected;
+    }
+
+    self.destroy = function() {
+        throw new Error;
     }
 
     return self;
@@ -120,10 +197,25 @@ function ShapeView(body, color) {
 function BallView(body, color) {
     var self = ShapeView(body, color);
 
+    var ball_svg = svg.append('circle')
+            .attr('stroke-width', 2)
+            .attr('stroke', COLORS.OBJECT_STROKE);
+
     self.draw = function() {
         var color = (self._isSelected) ? COLORS.SELECTED_SHAPE : self._color;
         var shape = self._body.GetFixtureList().GetShape();
-        debugDraw.DrawSolidCircle(self._body.GetPosition(), shape.GetRadius(), new b2Vec2(0, 0), color);
+        var r = shape.GetRadius();
+        var pos = self._body.GetPosition();
+
+        ball_svg
+            .attr('fill', color)
+            .attr('r', r * SCALE)
+            .attr('cx', pos.x * SCALE)
+            .attr('cy', pos.y * SCALE);
+    }
+
+    self.destroy = function() {
+        ball_svg.remove();
     }
 
     return self;
@@ -131,6 +223,10 @@ function BallView(body, color) {
 
 function PolygonView(body, color) {
     var self = ShapeView(body, color);
+
+    var polygon_svg = svg.append('path')
+        .attr('stroke-width', 2)
+        .attr('stroke', COLORS.OBJECT_STROKE);
 
     self.draw = function() {
         var color = (self._isSelected) ? COLORS.SELECTED_SHAPE : self._color;
@@ -141,8 +237,14 @@ function PolygonView(body, color) {
         for (var i = 0; i < shape.GetVertexCount(); ++i) {
             vertices.push(b2Math.MulX(transform, localVertices[i]));
         }
-        debugDraw.DrawSolidPolygon(vertices, vertices.length, color);
+        vertices.push(vertices[0]);
+        polygon_svg
+            .attr('fill', color)
+            .attr('d', pointsToSvgLine(vertices));
+    }
 
+    self.destroy = function() {
+        polygon_svg.remove();
     }
 
     return self;

@@ -141,21 +141,18 @@ function SelectionController () {
     // устанавливает стартовую точку (координаты x, y - в пикселях)
     self.mouseDown = function (point) {
         selectionPoints = [point, point];
-        console.log('down ', selectionPoints.length);
     }
 
     self.mouseMove = function (point) {
-        console.log('move ', selectionPoints.length);
         selectionPoints[1] = point;
     }
 
     self.mouseUp = function (point) {
-        console.log('up ', selectionPoints.length);
         if (!keyController.isActive(KEY_COMBINATIONS.HOLD_SELECTION)) {
             self.clearSelection();
         }
 
-        correctPoints();
+        selectionPoints = correctedPoints(selectionPoints);
         selectedArea.lowerBound.Set(selectionPoints[0].x, selectionPoints[0].y);
         selectedArea.upperBound.Set(selectionPoints[1].x, selectionPoints[1].y);
 
@@ -173,7 +170,6 @@ function SelectionController () {
         world.QueryAABB(getBodyCallback, selectedArea);
         deactivateAllBodies(activeBodies);
         self.reset();
-        console.log('selected ', self.selectedBodies.length);
 
          if (self.selectedBodies.length === 1) {            
             propertiesObject(self.selectedBodies[0]);
@@ -200,6 +196,7 @@ function SelectionController () {
     }
 
     self.reset = function () {
+        painter.reset();
         selectionPoints = [];
     }
 
@@ -219,17 +216,6 @@ function SelectionController () {
             self.selectedBodies.push(body);
             body.userData.setSelected(true);
         }
-    }
-
-    // корректирует начальную и конечную точки. xMin, yMin - верхний левый угол. xMax, yMax - нижний правый
-    var correctPoints = function () {
-        var startPoint = selectionPoints[0];
-        var endPoint = selectionPoints[1];
-        var xMax = (startPoint.x >= endPoint.x) ? startPoint.x : endPoint.x;
-        var xMin = (startPoint.x < endPoint.x) ? startPoint.x : endPoint.x;
-        var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
-        var yMin = (startPoint.y < endPoint.y) ? startPoint.y : endPoint.y;
-        selectionPoints = [new b2Vec2(xMin, yMin), new b2Vec2(xMax, yMax)];
     }
 
     return self;
@@ -308,6 +294,7 @@ function SelectOrMoveController (selectionController, moveController) {
 
     self.mouseUp = function (point) {
         currentController.mouseUp(point);
+        currentController = selectionController;
     }
 
     self.keyPressed = function () {

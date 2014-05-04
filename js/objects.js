@@ -18,7 +18,7 @@ function ObjectBuilder() {
 
         var body = world.CreateBody(bodyDef);	// создаем тело
         body.CreateFixture(fixDef);				// прикрепляем к телу фигуру
-        var color = hexToRgb($('#object_color').val());
+        var color = $('#object_color').val();
         body.userData = self._objectView(body, color); // устанавливаем отрисовщик
         return body;
     }

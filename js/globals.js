@@ -23,9 +23,8 @@ var FPS = 60; 	// отрисовка (кадров в секунду)
 var SCALE = 30;  // пикселей в метре
 
 var buoyancyController;	// контроллер плавучести
-var debugDraw;			// отрисовщик
 
-var canvas;		//объект canvas (форма в html)
+var svg;		// сцена где отрисовываются все объекты
 var CANVAS_WIDTH;	// размеры формы, где рисуем (canvas)
 var CANVAS_HEIGHT;
 
@@ -68,13 +67,15 @@ var KEY_COMBINATIONS = {
 var keyController;
 
 var COLORS = {
-    SELECTED_SHAPE: new b2Color(0, 0, 0.7),
-    CONTOUR_SHAPE: new b2Color(0, 1, 0),
-    CONTOUR_POINT: new b2Color(0, 1, 0),
-    SELECTED_AREA: new b2Color(0, 0, 0.8)
+    SELECTED_SHAPE: 'rgb(100, 100, 200)',
+    CONTOUR_SHAPE: 'rgb(0, 255, 0)',
+    CONTOUR_POINT: 'rgb(0, 200, 0)',
+    SELECTED_AREA: 'rgba(0, 0, 200, 0.25)',
+    SELECTED_STROKE: 'rgb(0, 0, 200)',
+    OBJECT_STROKE: 'rgb(0,0,0)'
 }
 
-CONTOUR_POINT_RADIUS = 0.05;
+CONTOUR_POINT_RADIUS = 5;
 
 // дефенишены для границ мира
 WORLD_BOUND_FIX_DEF = new b2FixtureDef;
