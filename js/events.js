@@ -32,7 +32,7 @@ function mouseDown(event) {		// обработчик нажатия мыши
     currentController.mouseDown(cursorPoint);
 }
 
-function mouseUp() {	// обработчик "отжатия" мыши
+function mouseUp(event) {	// обработчик "отжатия" мыши
     mousePressed = false;	// флажок на "отжат"
     var cursorPoint = new b2Vec2(toMeters(event.offsetX), toMeters(event.offsetY));		// точка, куда нажали
     currentController.mouseUp(cursorPoint);

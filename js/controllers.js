@@ -171,7 +171,7 @@ function SelectionController () {
         deactivateAllBodies(activeBodies);
         self.reset();
 
-         if (self.selectedBodies.length === 1) {            
+        if (self.selectedBodies.length === 1) {
             propertiesObject(self.selectedBodies[0]);
         }
         else {            
@@ -243,7 +243,7 @@ function MoveObjectController () {
 
             selectedObject.SetAwake(true);	// будим тело
 
-	    propertiesObject(selectedObject);
+	        propertiesObject(selectedObject);
         }
     }
 

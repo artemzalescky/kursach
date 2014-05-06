@@ -103,16 +103,18 @@ function update() {	// обновляем мир
         10       // кол-во итераций по расчету координат
     );
 
-    world.DrawDebugData();	// все рисуем
     painter.draw(); // отрисовываем контуры создаваемых фигур
-//    console.log(world.GetBodyCount() + ' count');
 
-    var body = world.GetBodyList();
-    while (body) {
+    for (var joint = world.GetJointList(); joint; joint = joint.GetNext()) {
+        if (joint.userData != undefined) {
+            joint.userData.draw();
+        }
+    }
+
+    for (var body = world.GetBodyList(); body; body = body.GetNext()) {
         if (body.userData) {
             body.userData.draw();
         }
-        body = body.GetNext();
     }
 
     // обработка касания с водой

@@ -249,3 +249,27 @@ function PolygonView(body, color) {
 
     return self;
 }
+
+function JointView(joint) {
+    var self = ShapeView(joint, COLORS.SELECTED_SHAPE);
+
+    var jointSvg = svg.append('line')
+        .attr('stroke-width', 2)
+        .attr('stroke', 'black');
+
+    self.draw = function() {
+        var p1 = self._body.GetAnchorA();
+        var p2 = self._body.GetAnchorB();
+
+        jointSvg.attr('x1', p1.x * SCALE)
+            .attr('y1', p1.y * SCALE)
+            .attr('x2', p2.x * SCALE)
+            .attr('y2', p2.y * SCALE);
+    }
+
+    self.destroy = function() {
+        jointSvg.remove();
+    }
+
+    return self;
+}
