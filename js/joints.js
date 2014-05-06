@@ -168,20 +168,16 @@ function chainJointBuilder () {
     var self = ChainBuilder();
 
      self._createChainJoint = function (bodies, points) {
-         alert("chainJointBuilder");
 
-         var worldScale = 30;
-         var links = 10;
-         // в зависимости от полученного числа звеньев, я рассчитываю длину одного звена
+
          var length = Math.abs(points[1].x - points[0].x);
-         var chainLength = 50/30;
-
+         var chainLength = 50 /SCALE;
+         var links = length/chainLength;
          var polygonShape = new b2PolygonShape();
-
          var fixtureDef = new b2FixtureDef();
          var bodyDef = new b2BodyDef();
          // шейп звена цепи
-         polygonShape.SetAsBox(5 / worldScale, chainLength / worldScale);
+         polygonShape.SetAsBox(5 / SCALE, chainLength / SCALE);
          fixtureDef.density = 1;
          fixtureDef.shape = polygonShape;
          // тело звена цепи
@@ -190,11 +186,11 @@ function chainJointBuilder () {
         var bodies2 = [];
          for (var i = 0; i <= links ; i++) {
 
-             bodyDef.position.Set(points[0].x + chainLength *i / worldScale, points[0].y);
+             bodyDef.position.Set(points[0].x + chainLength *i / SCALE, points[0].y);
              if (i == 0) {
                 points[0].x = 0;
                 points[0].y = 0;
-                points[1].x = 5 / worldScale;
+                points[1].x = 5 / SCALE;
                 points[1].y = chainLength;
 
                  var link = BoxBuilder().build(points,fixtureDef,bodyDef );
@@ -209,7 +205,7 @@ function chainJointBuilder () {
              } else {
                  points[0].x = 0;
                  points[0].y = 0;
-                 points[1].x = 5 / worldScale;
+                 points[1].x = 5 / SCALE;
                  points[1].y = chainLength;
 
                  var newLink = BoxBuilder().build(points,fixtureDef,bodyDef );
