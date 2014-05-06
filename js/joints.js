@@ -4,12 +4,14 @@ function JointBuilder () {
     self.REQUIRED_BODIES_NUMBER = null;
 
     self.createJoint = function (bodies, points) {
-        var jointDef = self._createJointDef(bodies, points)
-        world.CreateJoint(jointDef);
+        var jointDef = self._createJointDef(bodies, points);
+        var joint = world.CreateJoint(jointDef);
+        joint.userData = JointView(joint);
 
         for (i = 0; i < bodies.length; i++) {
             bodies[i].SetAwake(true);
         }
+        return joint;
     };
 
     self._createJointDef = function () {throw new Error};
@@ -82,15 +84,15 @@ function PrismaticJointBuilder () {
     self.REQUIRED_BODIES_NUMBER = 2;
 
     self._createJointDef = function (bodies, points) {
-        var joint = new Box2D.Dynamics.Joints.b2PrismaticJointDef();
-        joint.Initialize(bodies[0], bodies[1], points[0], axis);
-        joint.lowerTranslation = -5;
-        joint.upperTranslation = 5;
-        joint.enableLimit = true;
-        joint.maxMotorForce = 100;
-        joint.motorSpeed = 5.0;
-        joint.enableMotor = true;
-        return joint;
+        var jointDef = new Box2D.Dynamics.Joints.b2PrismaticJointDef();
+        jointDef.Initialize(bodies[0], bodies[1], points[0], axis);
+        jointDef.lowerTranslation = -5;
+        jointDef.upperTranslation = 5;
+        jointDef.enableLimit = true;
+        jointDef.maxMotorForce = 100;
+        jointDef.motorSpeed = 5.0;
+        jointDef.enableMotor = true;
+        return jointDef;
     }
 
     return self;

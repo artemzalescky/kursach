@@ -88,6 +88,7 @@ function toggleButton (buttonId) {
 
 function deleteObjects (bodies) {
     for (i = 0; i < bodies.length; i++) {
+        bodies[i].userData.destroy();
         world.DestroyBody(bodies[i]);
     }
 }
@@ -98,4 +99,14 @@ function hexToRgb(hex) {
     var g = parseInt(hex.substring(2, 4), 16) / 255;
     var b = parseInt(hex.substring(4, 6), 16) / 255;
     return new b2Color(r, g, b);
+}
+
+var correctedPoints = function (points) {
+    var startPoint = points[0];
+    var endPoint = points[1];
+    var xMax = (startPoint.x >= endPoint.x) ? startPoint.x : endPoint.x;
+    var xMin = (startPoint.x < endPoint.x) ? startPoint.x : endPoint.x;
+    var yMax = (startPoint.y >= endPoint.y) ? startPoint.y : endPoint.y;
+    var yMin = (startPoint.y < endPoint.y) ? startPoint.y : endPoint.y;
+    return [new b2Vec2(xMin, yMin), new b2Vec2(xMax, yMax)];
 }

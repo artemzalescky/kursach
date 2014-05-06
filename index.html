@@ -6,6 +6,7 @@
 
 		
 		<!-- библиотеки -->
+		<script type="text/javascript" src="lib/d3.js"></script>
 		<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
 		<script type="text/javascript" src="lib/jquery-2.0.3.js"></script>
 		
@@ -25,7 +26,7 @@
 	<body onload="init();">
 
         <!-- форма для отрисовки -->
-        <canvas id="canvas" width="950" height="600"></canvas>
+        <svg id="canvas" width="950" height="600"></svg>
 
 		<!-- форма для выбора объектов -->
 		<div id="select_list">
@@ -58,7 +59,7 @@
 
                     <hr class="line">
                     <span>Цвет объекта</span>
-                    <input type="color" id="object_color">
+                    <input type="color" id="object_color" value="#ff0000">
 
                     <hr class="line">
                     <span title='в диапазоне от 0,1 до 15'>Плотность</span>
@@ -165,7 +166,11 @@
 
             <div id="pause_simulation_button" class="toggle_button">Пауза</div>
             <div id="save_button" class="toggle_button" onclick="saveJSON();">Сохранить</div>
-            <div id="test_button" class="toggle_button" onclick="test();">ЦЕПЬ тест</div>
+            <br>
+            <div id="move_body_button" class="toggle_button">Move</div>
+            <div id="rotate_body_button" class="toggle_button">Rotate</div>
+            <div id="scale_body_button" class="toggle_button">Scale</div>
+
 		</div>
 	</body>   
 </html>
