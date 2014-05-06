@@ -75,7 +75,7 @@ function BoxBuilder() {
 
         shape = new b2PolygonShape;		// фигура - многоугольник
         shape.SetAsBox(width / 2, height / 2);		// прямоугольник
-		
+
 		if(fixDef.isSensor == true)
 			setupBuoyancyController(points[0].y*SCALE);					// настраиваем контроллер плавучести
 
@@ -106,3 +106,5 @@ function PolyBuilder() {
 
     return self;
 }
+
+

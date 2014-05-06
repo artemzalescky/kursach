@@ -353,3 +353,32 @@ function JointCreationController (jointBuilder) {
 
     return self;
 }
+
+function ChainJointCreationController (chainjointBuilder) {
+    var self = BaseController();
+
+    var bodies = [];
+    var points = [];
+
+    self._chainjointBuilder = chainjointBuilder;
+
+    self.mouseUp = function (point) {
+        var body = getBodyAtPoint(point, true);
+        if (body) {
+            bodies.push(body);
+            points.push(point);
+        }
+        if (bodies.length == 2) {
+            self._chainjointBuilder.createChainJoint(bodies, points);
+            self.reset();
+            jointCreated();
+        }
+    };
+
+    self.reset = function () {
+        bodies = [];
+        points = [];
+    };
+
+    return self;
+}
