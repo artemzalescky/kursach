@@ -52,7 +52,6 @@ function getSimpleObject(body){
         res.sizeX = body.GetFixtureList().GetAABB().GetExtents().x;
         res.sizeY = body.GetFixtureList().GetAABB().GetExtents().y;
     }
-    alert(res);
     return res;
 }
 
