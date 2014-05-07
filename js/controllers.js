@@ -218,7 +218,7 @@ function SelectionController () {
         }
     }
 
-    return self;
+   return self;
 }
 
 function MoveObjectController () {
