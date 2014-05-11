@@ -72,9 +72,9 @@ function RevoluteJointBuilder () {
 }
 
 function RevoluteChainJointBuilder () {
-    var self = JointBuilder();
+    var self = JointBuilder(GearJointView);
 
-    self.REQUIRED_BODIES_NUMBER = 2;
+    self.REQUIRED_OBJECTS_COUNT = 2;
 
     self._createJointDef = function (bodies, points) {
 
@@ -176,7 +176,6 @@ function PulleyJointBuilder () {
 function ChainBuilder () {
     var self = {};
 
-
     self.createChainJoint = function (bodies, points) {
         var bodyDef = self._createChainJoint(bodies, points)
         for (i = 0; i < bodies.length; i++) {
@@ -194,8 +193,6 @@ function chainJointBuilder () {
     var self = ChainBuilder();
 
     self._createChainJoint = function (bodies, points) {
-
-
         var length = Math.abs(points[1].x - points[0].x);
         var chainLength = 50 /SCALE;
         var links = length/chainLength;
@@ -210,7 +207,7 @@ function chainJointBuilder () {
         bodyDef.type = b2Body.b2_dynamicBody;
         // создание звена цепи
         var bodies2 = [];
-        for (var i = 0; i <= links ; i++) {
+        for (var i = 0; i < links ; i++) {
 
             bodyDef.position.Set(points[0].x + chainLength *i / SCALE, points[0].y);
             if (i == 0) {
@@ -245,7 +242,6 @@ function chainJointBuilder () {
                 link = newLink;
             }
         }
-
         // прикрепляем к концу цепи
         bodies2[0] = link;
         bodies2[1] = bodies[1];
@@ -254,7 +250,6 @@ function chainJointBuilder () {
         points[1].x = 0;
         points[1].y = 0;
         RevoluteChainJointBuilder().createJoint(bodies2,points);
-
     }
 
     return self;

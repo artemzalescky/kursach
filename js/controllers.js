@@ -227,7 +227,7 @@ function SelectionController () {
     }
 
     self.addJointToJointsList = function(joint) {
-
+        // TODO: add to joints list
     }
 
     self.addJointToSelected = function(joint) {
