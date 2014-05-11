@@ -232,6 +232,7 @@ function BallView(body, color) {
 
     self.destroy = function() {
         ball_svg.remove();
+        angleLineSvg.remove();
     }
 
     return self;
