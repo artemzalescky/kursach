@@ -56,10 +56,7 @@ function keyUp (event) {
 }
 
 function propertiesObject(selectedObject) {
-
     if (selectedObject) {        // если там было тело
-
-
         var shapeObject = selectedObject.GetFixtureList().GetShape().GetType();
         switch (shapeObject) {
             case 0:  document.getElementById('properties_object_shape').value = "Снаряд"; break;
@@ -122,7 +119,6 @@ function propertiesObject(selectedObject) {
 }
 
 function updateObjectProperties() {	// обновить свойства выделенного объекта
-    
     if (selectionController.selectedBodies.length == 1) {		// есть выделенное тело
         var selectedObject = selectionController.selectedBodies[0];
         var f = selectedObject.GetFixtureList();

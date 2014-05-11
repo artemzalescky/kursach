@@ -85,7 +85,7 @@ function wakeAllBodies() {	// разбудить все тела (для изм�
 }
 
 function setupDrawing() {
-    svg = d3.select('svg#canvas');
+    svgCanvas = d3.select('svg#canvas');
 }
 
 function rotateCurrentObject() { //повернуть выделенный объект

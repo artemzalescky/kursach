@@ -137,6 +137,7 @@ function SelectionController () {
     var selectedArea = new b2AABB(); // выделенная область
 
     self.selectedBodies = []; // список выделенных фигур
+    self.selectedJoints = [];
 
     // устанавливает стартовую точку (координаты x, y - в пикселях)
     self.mouseDown = function (point) {
@@ -183,6 +184,7 @@ function SelectionController () {
     self.keyPressed = function () {
         if (keyController.isActive(KEY_COMBINATIONS.DELETE)) {
             deleteObjects(self.selectedBodies);
+            deleteJoints(self.selectedJoints);
             self.reset();
         } else if (keyController.isActive(KEY_COMBINATIONS.SELECT_ALL)) {
             var body = world.GetBodyList();
@@ -200,21 +202,49 @@ function SelectionController () {
         selectionPoints = [];
     }
 
+    self.removeJointFromJointsList = function(jointIndex) {
+        // TODO: remove from list of selected joints
+    }
+
+    self.removeJointFromSelected = function(jointIndex) {
+        self.selectedJoints.splice(jointIndex, 1);
+        self.removeJointFromJointsList(jointIndex);
+    }
+
     self.clearSelection = function () {
         for (var i = 0; i < self.selectedBodies.length; ++i) {
             self.selectedBodies[i].userData.setSelected(false);
         }
         self.selectedBodies = [];
+
+        for (var i = 0; i < self.selectedJoints.length; ++i) {
+            self.removeJointFromSelected(self.selectedJoints[i]);
+        }
     }
 
     self.getPoints = function () {
         return selectionPoints;
     }
 
+    self.addJointToJointsList = function(joint) {
+
+    }
+
+    self.addJointToSelected = function(joint) {
+        self.selectedJoints.push(joint);
+        self.addJointToJointsList(joint);
+    }
+
+    // add body to selected bodies and all attached joint to selected joints
     self.addBodyToSelected = function (body) {
         if (!itemInArray(body, self.selectedBodies) && !itemInArray(body, worldBounds)) {
             self.selectedBodies.push(body);
             body.userData.setSelected(true);
+        }
+        for (var jointEdge = body.GetJointList(); jointEdge; jointEdge = jointEdge.next) {
+            if (!itemInArray(jointEdge.joint, self.selectedJoints)) {
+                self.addJointToSelected(jointEdge.joint);
+            }
         }
     }
 
@@ -322,11 +352,13 @@ function JointCreationController (jointBuilder) {
 
     self.mouseUp = function (point) {
         var body = getBodyAtPoint(point, true);
-        if (body) {
-            bodies.push(body);
+        if (self._jointBuilder.isValid(body, bodies.length)) {
+            if (body) {
+                bodies.push(body);
+            }
             points.push(point);
         }
-        if (bodies.length == self._jointBuilder.REQUIRED_BODIES_NUMBER) {
+        if (points.length == self._jointBuilder.REQUIRED_OBJECTS_COUNT) {
             self._jointBuilder.createJoint(bodies, points);
             self.reset();
             jointCreated();

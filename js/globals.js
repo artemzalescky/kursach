@@ -24,7 +24,7 @@ var SCALE = 30;  // пикселей в метре
 
 var buoyancyController;	// контроллер плавучести
 
-var svg;		// сцена где отрисовываются все объекты
+var svgCanvas;		// сцена где отрисовываются все объекты
 var CANVAS_WIDTH;	// размеры формы, где рисуем (canvas)
 var CANVAS_HEIGHT;
 

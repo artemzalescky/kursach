@@ -86,10 +86,25 @@ function toggleButton (buttonId) {
     return !isChecked;
 }
 
+function deleteObject(body) {
+    body.userData.destroy();
+    world.DestroyBody(body);
+}
+
 function deleteObjects (bodies) {
     for (i = 0; i < bodies.length; i++) {
-        bodies[i].userData.destroy();
-        world.DestroyBody(bodies[i]);
+        deleteObject(bodies[i]);
+    }
+}
+
+function deleteJoint(joint) {
+    joint.userData.destroy();
+    world.DestroyJoint(joint);
+}
+
+function deleteJoints(joints) {
+    for (i = 0; i < joints.length; ++i) {
+        deleteJoint(joints[i]);
     }
 }
 
@@ -110,3 +125,34 @@ var correctedPoints = function (points) {
     var yMin = (startPoint.y < endPoint.y) ? startPoint.y : endPoint.y;
     return [new b2Vec2(xMin, yMin), new b2Vec2(xMax, yMax)];
 }
+
+// functions for d3 transformations
+var translateStr = function(p1, p2) {
+    return "translate(" + p1 + "," + p2 + ")";
+}
+
+var rotateStr = function(degreeAngle) {
+    return "rotate(" + degreeAngle + ")";
+}
+
+var scaleStr = function(sx, sy) {
+    return "scale(" + sx + "," + sy + ")";
+}
+
+var getAngle = function(p1, p2) {
+    var dx = p2.x - p1.x;
+    var dy = p2.y - p1.y;
+    var angle = Math.atan2(dy, dx);
+    var degreeAngle = toDegrees(angle) + 360;
+    return degreeAngle % 360;
+}
+
+var getDistance = function(p1, p2) {
+    var vectLength = new b2Vec2(p1.x - p2.x, p2.y - p1.y);
+    return vectLength.Length();
+}
+
+var pointsToSvgLinePx = d3.svg.line()
+    .x(function(point) {return point.x;})
+    .y(function(point) {return point.y;})
+    .interpolate("linear");
