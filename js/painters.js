@@ -201,6 +201,11 @@ function BallView(body, color) {
             .attr('stroke-width', 2)
             .attr('stroke', COLORS.OBJECT_STROKE);
 
+    var angleLineSvg = svgCanvas.append('line')
+            .attr('stroke-width', 1)
+            .attr('stroke', COLORS.OBJECT_STROKE)
+            .attr('fill', 'none');
+
     self.draw = function() {
         var color = (self._isSelected) ? COLORS.SELECTED_SHAPE : self._color;
         var shape = self._body.GetFixtureList().GetShape();
@@ -212,6 +217,17 @@ function BallView(body, color) {
             .attr('r', r * SCALE)
             .attr('cx', pos.x * SCALE)
             .attr('cy', pos.y * SCALE);
+
+        // Draw body angle line
+        angle = -self._body.GetAngle();
+        xStrokePoint = pos.x + r * Math.sin(angle);
+        yStrokePoint = pos.y + r * Math.cos(angle);
+        angleLineSvg
+            .attr('x1', pos.x * SCALE)
+            .attr('y1', pos.y * SCALE)
+            .attr('x2', xStrokePoint * SCALE)
+            .attr('y2', yStrokePoint * SCALE);
+
     }
 
     self.destroy = function() {
