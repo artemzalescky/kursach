@@ -8,7 +8,8 @@ CONTROLLERS = {
     'revolute_joint': JointCreationController(RevoluteJointBuilder()),
     'prismatic_joint': JointCreationController(PrismaticJointBuilder()),
     'gear_joint': JointCreationController(GearJointBuilder()),
-    'pulley_joint': JointCreationController(PulleyJointBuilder())
+    'pulley_joint': JointCreationController(PulleyJointBuilder()),
+    'chain': ChainJointCreationController(chainJointBuilder())
 }
 
 PAINTERS = {

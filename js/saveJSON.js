@@ -2,16 +2,12 @@ function saveJSON(){
     var masObject=[];   //массив объектов
     var masJoint=[];    //массив в котором будут храниться соединения
 
-    
     for(var currentBody = world.GetBodyList(); currentBody; currentBody = currentBody.GetNext()){
 
         var obj = getSimpleObject(currentBody);
         //alert(JSON.stringify(obj));
         console.log(obj);
     }
-    
-    
-
 }
 
 function getSimpleObject(body){

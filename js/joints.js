@@ -54,10 +54,10 @@ function RevoluteJointBuilder () {
 
     self._createJointDef = function (bodies, points) {
         var jointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
-        jointDef.Initialize(bodies[0], bodies[1], points[2]);
+        jointDef.Initialize(bodies[0], bodies[1], points[0]);
         jointDef.enableMotor = false;
         jointDef.motorSpeed = 20;
-        jointDef.maxMotorTorque = 10000;
+        jointDef.maxMotorTorque = 50;
         return jointDef;
     }
 
@@ -67,6 +67,24 @@ function RevoluteJointBuilder () {
         }
         return true;
     }
+
+    return self;
+}
+
+function RevoluteChainJointBuilder () {
+    var self = JointBuilder();
+
+    self.REQUIRED_BODIES_NUMBER = 2;
+
+    self._createJointDef = function (bodies, points) {
+
+        var revoluteJointDef = new Box2D.Dynamics.Joints.b2RevoluteJointDef();
+        revoluteJointDef.localAnchorA.Set(points[0].x, points[0].y);
+        revoluteJointDef.localAnchorB.Set(points[1].x, points[1].y);
+        revoluteJointDef.bodyA = bodies[0];
+        revoluteJointDef.bodyB = bodies[1];
+        return revoluteJointDef;
+     }
 
     return self;
 }
@@ -150,6 +168,93 @@ function PulleyJointBuilder () {
 
     self.isValid = function(body, bCount) {
         return (bCount < 2 && !body) ? false : true;
+    }
+
+    return self;
+}
+
+function ChainBuilder () {
+    var self = {};
+
+
+    self.createChainJoint = function (bodies, points) {
+        var bodyDef = self._createChainJoint(bodies, points)
+        for (i = 0; i < bodies.length; i++) {
+            bodies[i].SetAwake(true);
+        }
+    };
+
+    self._createChainJointDef = function () {throw new Error};
+
+    return self;
+}
+
+function chainJointBuilder () {
+
+    var self = ChainBuilder();
+
+    self._createChainJoint = function (bodies, points) {
+
+
+        var length = Math.abs(points[1].x - points[0].x);
+        var chainLength = 50 /SCALE;
+        var links = length/chainLength;
+        var polygonShape = new b2PolygonShape();
+        var fixtureDef = new b2FixtureDef();
+        var bodyDef = new b2BodyDef();
+        // шейп звена цепи
+        polygonShape.SetAsBox(5 / SCALE, chainLength / SCALE);
+        fixtureDef.density = 1;
+        fixtureDef.shape = polygonShape;
+        // тело звена цепи
+        bodyDef.type = b2Body.b2_dynamicBody;
+        // создание звена цепи
+        var bodies2 = [];
+        for (var i = 0; i <= links ; i++) {
+
+            bodyDef.position.Set(points[0].x + chainLength *i / SCALE, points[0].y);
+            if (i == 0) {
+                points[0].x = 0;
+                points[0].y = 0;
+                points[1].x = 5 / SCALE;
+                points[1].y = chainLength;
+
+                var link = BoxBuilder().build(points,fixtureDef,bodyDef );
+                bodies2[0] = bodies[0];
+                bodies2[1] = link;
+                points[0].x = 0;
+                points[0].y = 0;
+                points[1].y = -chainLength/2;
+                points[1].x = 0;
+
+                RevoluteChainJointBuilder().createJoint(bodies2,points);
+            } else {
+                points[0].x = 0;
+                points[0].y = 0;
+                points[1].x = 5 / SCALE;
+                points[1].y = chainLength;
+
+                var newLink = BoxBuilder().build(points,fixtureDef,bodyDef );
+                bodies2[0] = link;
+                bodies2[1] = newLink;
+                points[0].x = 0;
+                points[0].y = chainLength/2;
+                points[1].x = 0;
+                points[1].y = -chainLength/2;
+                RevoluteChainJointBuilder().createJoint(bodies2,points);
+                link = newLink;
+            }
+        }
+
+        // прикрепляем к концу цепи
+        bodies2[0] = link;
+        bodies2[1] = bodies[1];
+        points[0].x = 0;
+        points[0].y = chainLength;
+        points[1].x = 0;
+        points[1].y = 0;
+        RevoluteChainJointBuilder().createJoint(bodies2,points);
+
     }
 
     return self;

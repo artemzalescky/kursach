@@ -21,6 +21,7 @@
 		<script type="text/javascript" src="js/events.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript" src="js/saveJSON.js"></script>
+        <script type="text/javascript" src="js/clone.js"></script>
 	</head>
 	
 	<body onload="init();">
@@ -97,6 +98,7 @@
                             <option value="prismatic_joint">Prismatic</option>
                             <option value="gear_joint">Gear</option>
                             <option value="pulley_joint">Pulley</option>
+                            <option value="chain">Chain</option>
                         </select>
 
                     </div>
@@ -176,6 +178,8 @@
             <div id="move_body_button" class="toggle_button">Move</div>
             <div id="rotate_body_button" class="toggle_button">Rotate</div>
             <div id="scale_body_button" class="toggle_button">Scale</div>
-		</div>
+            <br>
+            <div id="clone_button" class="toggle_button" onclick="clone();">Клонировать</div>
+        </div>
 	</body>   
 </html>
