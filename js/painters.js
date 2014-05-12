@@ -296,14 +296,19 @@ function JointView(joint) {
 function RevoluteJointView(joint) {
     var self = JointView(joint);
 
-    var jointSvgA = svgCanvas.append('path')
-        .attr('stroke-width', 2)
-        .attr('stroke', 'black')
-        .attr('fill', 'none');
-    var jointSvgB = svgCanvas.append('path')
-        .attr('stroke-width', 2)
-        .attr('stroke', 'black')
-        .attr('fill', 'none');
+    var jointSvgLines = [];
+    for (var i = 0; i < 2; ++i) {
+        jointSvgLines.push(svgCanvas.append('line')
+            .attr('stroke-width', 2)
+            .attr('stroke', 'black'));
+    }
+
+    var jointSvgCircles = [];
+    for (var i = 0; i < 3; ++i) {
+        jointSvgCircles.push(svgCanvas.append('circle')
+            .attr('fill', 'black')
+            .attr('r', 4));
+    }
 
     var jointSvgCircle = svgCanvas.append('circle')
         .attr('stroke-width', 3)
@@ -313,41 +318,38 @@ function RevoluteJointView(joint) {
 
     self._draw = function(p1, p2) {
         // p1 and p2 in this case are one point
-        var bodyAPos = self._joint.GetBodyA().GetPosition();
-        var bodyBPos = self._joint.GetBodyB().GetPosition();
+        var positions = [];
+        positions.push(self._joint.GetBodyA().GetPosition());
+        positions.push(self._joint.GetBodyB().GetPosition());
+        positions.push(p1);
 
-        var lengthA = getDistance(p1, bodyAPos) * SCALE;
-        var lengthB = getDistance(p1, bodyBPos) * SCALE;
+        for (var i = 0; i < 3; ++i) {
+            jointSvgCircles[i]
+                .attr('cx', positions[i].x * SCALE)
+                .attr('cy', positions[i].y * SCALE);
+        }
 
-        var pointsA = self._generatePoints(lengthA);
-        var pointsB = self._generatePoints(lengthB);
-
-        jointSvgA
-            .attr('d', pointsToSvgLinePx(pointsA))
-            .attr('transform', self._getTransform(p1, bodyAPos));
-
-        jointSvgB
-            .attr('d', pointsToSvgLinePx(pointsB))
-            .attr('transform', self._getTransform(p1, bodyBPos));
+        for (var i = 0; i < 2; ++i) {
+            jointSvgLines[i]
+                .attr('x1', positions[i].x * SCALE)
+                .attr('y1', positions[i].y * SCALE)
+                .attr('x2', p1.x * SCALE)
+                .attr('y2', p1.y * SCALE);
+        }
 
         jointSvgCircle
             .attr('cx', p1.x * SCALE)
             .attr('cy', p1.y * SCALE);
     }
 
-    self._generatePoints = function(length) {
-        var points = [];
-        points.push(new b2Vec2(0, -10));
-        points.push(new b2Vec2(0, 10));
-        points.push(new b2Vec2(0, 0));
-        points.push(new b2Vec2(length, 0));
-        return points;
-    }
-
     self.destroy = function() {
-        jointSvgA.remove();
-        jointSvgB.remove();
         jointSvgCircle.remove();
+        for (var i = 0; i < 2; ++i) {
+            jointSvgLines[i].remove();
+        }
+        for (var i = 0; i < 3; ++i) {
+            jointSvgCircles[i].remove();
+        }
     }
 
     return self;
@@ -356,27 +358,40 @@ function RevoluteJointView(joint) {
 function DistanceJointView(joint) {
     var self = JointView(joint);
 
-    var jointSvg = svgCanvas.append('path')
-        .attr('stroke-width', 6)
+    var jointSvg = svgCanvas.append('line')
+        .attr('stroke-width', 2)
         .attr('stroke', 'black')
         .attr('fill', 'none');
 
+    var jointSvgCircles = [];
+    for (var i = 0; i < 2; ++i) {
+        jointSvgCircles.push(svgCanvas.append('circle')
+            .attr('fill', 'black')
+            .attr('r', 4));
+    }
+
     self._draw = function(p1, p2) {
         var points = [];
-
-        var bodyAPos = self._joint.GetBodyA().GetPosition();
-        var bodyBPos = self._joint.GetBodyB().GetPosition();
-
-        points.push(bodyAPos);
         points.push(p1);
         points.push(p2);
-        points.push(bodyBPos);
 
-        jointSvg.attr('d', pointsToSvgLine(points));
+        for (var i = 0; i < 2; ++i) {
+            jointSvgCircles[i]
+                .attr('cx', points[i].x * SCALE)
+                .attr('cy', points[i].y * SCALE);
+        }
+        jointSvg
+            .attr('x1', p1.x * SCALE)
+            .attr('y1', p1.y * SCALE)
+            .attr('x2', p2.x * SCALE)
+            .attr('y2', p2.y * SCALE);
     }
 
     self.destroy = function() {
         jointSvg.remove();
+        for (var i = 0; i < jointSvgCircles.length; ++i) {
+            jointSvgCircles[i].remove();
+        }
     }
 
     return self;
